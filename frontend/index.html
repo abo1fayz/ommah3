@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول - معهد جيل الأمة</title>
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px 0;
+    }
+    .login-container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 350px;
+      text-align: center;
+    }
+    .logo img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #2c786c;
+      object-fit: cover;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #2c786c;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      text-align: right;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #2c786c;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 5px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #004445;
+    }
+    .message {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    .error {
+      background-color: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
+    }
+    .success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+    .loading {
+      display: none;
+      margin-top: 20px;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #2c786c;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .competitions-link {
+      display: inline-block;
+      background-color: #f8b400;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .competitions-link:hover {
+      background-color: #e6a200;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <img src="photo_2025-09-27_14-01-40.jpg" alt="شعار المعهد">
+    </div>
+    <h1>تسجيل الدخول للطالب</h1>
+
+    <div class="form-group">
+      <label for="studentCode">كود الدخول</label>
+      <input type="text" id="studentCode" placeholder="أدخل الكود المكون من 6 أرقام" maxlength="6">
+    </div>
+
+    <button id="loginBtn">دخول</button>
+
+    <!-- زر المسابقات الجديد -->
+    <a href="competitions" class="competitions-link">
+      🏆 المسابقات والفائزين
+    </a>
+
+    <div id="message" class="message"></div>
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ تعديل الرابط ليضرب على المسار النسبي
+    const API_URL = "/api/students/login";
+
+    function showMessage(text, type) {
+      const messageDiv = document.getElementById("message");
+      messageDiv.textContent = text;
+      messageDiv.className = "message " + type;
+      messageDiv.style.display = "block";
+
+      setTimeout(() => {
+        messageDiv.style.display = "none";
+      }, 4000);
+    }
+
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const code = document.getElementById("studentCode").value.trim();
+      const loadingDiv = document.getElementById("loading");
+      const loginBtn = document.getElementById("loginBtn");
+
+      if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
+        showMessage("⚠️ الرجاء إدخال كود صحيح مكون من 6 أرقام", "error");
+        return;
+      }
+
+      try {
+        loadingDiv.style.display = "block";
+        loginBtn.disabled = true;
+
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
+        });
+
+        if (!response.ok) {
+          showMessage("❌ كود الدخول غير صحيح", "error");
+          return;
+        }
+
+        const student = await response.json();
+        // ✅ تخزين بيانات الطالب مؤقتًا
+        localStorage.setItem("currentStudent", JSON.stringify(student));
+        showMessage("✅ تم تسجيل الدخول بنجاح", "success");
+
+        setTimeout(() => {
+          window.location.href = "student";
+        }, 1000);
+      } catch (err) {
+        showMessage("⚠️ حدث خطأ أثناء تسجيل الدخول", "error");
+      } finally {
+        loadingDiv.style.display = "none";
+        loginBtn.disabled = false;
+      }
+    });
+
+    document.getElementById("studentCode").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        document.getElementById("loginBtn").click();
+      }
+    });
+  </script>
+</body>
+</html>
