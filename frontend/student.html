@@ -505,9 +505,9 @@
       }
 
       // تعبئة الجداول مع الترتيب حسب التاريخ
-      fillTable("lessonTestsTable", student.lessonTests, "lessonName");
-      fillTable("tajweedTestsTable", student.tajweedTests, "testName");
-      fillTable("memorizationTestsTable", student.memorizationTests, "testName");
+      fillTable("lessonTestsTable", student.lessonTests, "lessonName", "lesson");
+      fillTable("tajweedTestsTable", student.tajweedTests, "testName", "quran");
+      fillTable("memorizationTestsTable", student.memorizationTests, "testName", "quran");
 
       // الصفحات الشهرية
       const pagesTable = document.getElementById("pagesTable");
@@ -539,7 +539,7 @@
       updateStatistics(student);
     };
 
-    // دالة لتحديد التقييم بناءً على النتيجة
+    // دالة لتحديد التقييم بناءً على النسبة المئوية (لاختبارات الدروس)
     function getRating(result) {
       if (!result) return { text: "غير محدد", class: "" };
       
@@ -561,15 +561,42 @@
       }
     }
 
-    function fillTable(tableId, tests, nameField) {
+    // دالة جديدة لتقييم اختبارات القرآن حسب النظام الجديد
+    function getQuranRating(result) {
+      if (!result) return { text: "غير محدد", class: "" };
+      
+      // استخراج الرقم من النتيجة (في حالة وجود % أو نص آخر)
+      const resultValue = parseInt(result.toString().replace(/\D/g, ''));
+      
+      if (isNaN(resultValue)) return { text: "غير محدد", class: "" };
+      
+      if (resultValue >= 97 && resultValue <= 100) {
+        return { text: "تفوق", class: "rating-excellent" };
+      } else if (resultValue >= 94 && resultValue <= 96) {
+        return { text: "ممتاز", class: "rating-very-good" };
+      } else if (resultValue >= 91 && resultValue <= 93) {
+        return { text: "جيد جدا", class: "rating-good" };
+      } else if (resultValue >= 85 && resultValue <= 90) {
+        return { text: "جيد", class: "rating-average" };
+      } else {
+        return { text: "اعادة", class: "rating-weak" };
+      }
+    }
+
+    function fillTable(tableId, tests, nameField, tableType) {
       const table = document.getElementById(tableId);
       if (tests && tests.length > 0) {
         // ترتيب الاختبارات حسب التاريخ (الأحدث أولاً)
         const sortedTests = sortTestsByDate(tests);
         
         sortedTests.forEach((t, index) => {
-          // الحصول على التقييم المناسب للنتيجة
-          const rating = getRating(t.result);
+          // الحصول على التقييم المناسب للنتيجة حسب نوع الجدول
+          let rating;
+          if (tableType === "quran") {
+            rating = getQuranRating(t.result);
+          } else {
+            rating = getRating(t.result);
+          }
           
           const row = `<tr${index === 0 ? ' class="latest-row"' : ''}>
             <td>${t[nameField]}${index === 0 ? '<span class="latest-badge">الأحدث</span>' : ''}</td>
