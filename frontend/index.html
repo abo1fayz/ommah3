@@ -22,7 +22,8 @@
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             --radius: 16px;
             --transition: all 0.3s ease;
-            --safe-area: env(safe-area-inset-bottom, 0px);
+            --success: #2e7d32;
+            --error: #c62828;
         }
 
         * {
@@ -43,7 +44,7 @@
             padding-bottom: 70px;
         }
 
-        /* Header - تطبيق الموبايل */
+        /* Header */
         .app-header {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: var(--white);
@@ -104,7 +105,22 @@
             padding: 0 0 80px 0;
         }
 
-        /* Hero Section - تسجيل الدخول أولاً */
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Hero Section */
         .hero-section {
             background: linear-gradient(135deg, var(--primary-light), var(--primary));
             color: var(--white);
@@ -158,7 +174,7 @@
             margin-bottom: 30px;
         }
 
-        /* تسجيل الدخول */
+        /* Login Card */
         .login-card {
             background: var(--white);
             border-radius: var(--radius);
@@ -336,6 +352,7 @@
             border-radius: var(--radius);
             overflow: hidden;
             box-shadow: var(--shadow);
+            cursor: pointer;
         }
 
         .achievement-image {
@@ -561,7 +578,7 @@
             font-size: 0.95rem;
         }
 
-        /* Navigation Bar - تطبيق الموبايل */
+        /* Navigation Bar */
         .mobile-nav {
             position: fixed;
             bottom: 0;
@@ -570,7 +587,6 @@
             background: var(--white);
             border-top: 1px solid #e0e0e0;
             padding: 10px 20px;
-            padding-bottom: calc(10px + var(--safe-area));
             display: flex;
             justify-content: space-around;
             align-items: center;
@@ -587,10 +603,12 @@
             padding: 8px 0;
             border-radius: 10px;
             transition: var(--transition);
+            cursor: pointer;
         }
 
         .nav-item.active {
             color: var(--primary);
+            background: rgba(44, 120, 108, 0.05);
         }
 
         .nav-item:hover {
@@ -618,13 +636,13 @@
 
         .message.error {
             background: #ffebee;
-            color: #c62828;
+            color: var(--error);
             border: 1px solid #ffcdd2;
         }
 
         .message.success {
             background: #e8f5e9;
-            color: #2e7d32;
+            color: var(--success);
             border: 1px solid #c8e6c9;
         }
 
@@ -641,7 +659,6 @@
 
         /* Loading */
         .loading {
-            display: none;
             text-align: center;
             padding: 20px;
         }
@@ -659,29 +676,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (min-width: 768px) {
-            .main-content {
-                max-width: 500px;
-                margin: 60px auto 0;
-                padding-bottom: 80px;
-            }
-            
-            .features-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .about-features {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .mobile-nav {
-                max-width: 500px;
-                left: 50%;
-                transform: translateX(-50%);
-            }
         }
 
         /* Scroll to top button */
@@ -711,55 +705,201 @@
             visibility: visible;
         }
 
-        /* Back to top anchor styling */
-        a[name] {
-            display: block;
-            position: relative;
-            top: -60px;
-            visibility: hidden;
+        /* Achievement Detail Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+            padding: 20px;
         }
 
-        /* Achievements placeholder when loading */
-        .achievements-placeholder {
-            text-align: center;
-            padding: 40px 20px;
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            color: var(--primary-dark);
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
             color: var(--text);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
         }
 
-        .achievements-placeholder i {
-            font-size: 3rem;
-            color: #e0e0e0;
+        .close-modal:hover {
+            background: #f5f5f5;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-description {
+            color: var(--text);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .modal-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .modal-stat {
+            text-align: center;
+            flex: 1;
+        }
+
+        .modal-stat i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .modal-stat span {
+            display: block;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .modal-comments {
+            margin-top: 20px;
+        }
+
+        .comments-title {
+            color: var(--primary-dark);
             margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
 
-        /* Sections visibility control */
-        .section {
-            display: none;
-            animation: fadeIn 0.5s ease;
+        .comment-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-right: 3px solid var(--primary);
         }
 
-        .section.active {
-            display: block;
+        .comment-user {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .comment-text {
+            color: var(--text);
+            line-height: 1.6;
         }
 
-        /* Home section specific */
-        #home.active {
-            display: block;
+        .comment-date {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: left;
+            margin-top: 5px;
         }
 
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
+        .comment-form {
+            margin-top: 20px;
         }
 
-        /* Hide sections initially except home */
-        #about, #achievements-full, #competitions-full, #contact {
-            display: none;
+        .comment-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            margin-bottom: 10px;
+            resize: vertical;
+        }
+
+        .comment-submit {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Tajawal';
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .main-content {
+                max-width: 500px;
+                margin: 60px auto 0;
+                padding-bottom: 80px;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .about-features {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .mobile-nav {
+                max-width: 500px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
         }
     </style>
 </head>
@@ -779,7 +919,7 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Home Section (Default) -->
+        <!-- Home Section -->
         <section id="home" class="section active">
             <!-- Hero Section -->
             <div class="hero-section">
@@ -810,7 +950,7 @@
                 </button>
                 
                 <div id="loginMessage" class="message"></div>
-                <div id="loginLoading" class="loading">
+                <div id="loginLoading" class="loading" style="display: none;">
                     <div class="spinner"></div>
                     <p>جاري تسجيل الدخول...</p>
                 </div>
@@ -858,19 +998,16 @@
                         <i class="fas fa-trophy"></i>
                         أحدث الإنجازات
                     </h3>
-                    <a href="#achievements-full" class="view-all" onclick="showSection('achievements-full')">
+                    <a href="javascript:void(0)" class="view-all" onclick="showSection('achievements')">
                         عرض الكل
                         <i class="fas fa-arrow-left"></i>
                     </a>
                 </div>
                 
                 <div id="achievementsCarousel" class="achievements-carousel">
-                    <!-- سيتم تعبئتها عبر JavaScript -->
-                </div>
-                
-                <div id="achievementsLoading" class="loading">
-                    <div class="spinner"></div>
-                    <p>جاري تحميل الإنجازات...</p>
+                    <div class="loading" style="padding: 40px 0;">
+                        <div class="spinner"></div>
+                    </div>
                 </div>
             </div>
 
@@ -881,26 +1018,65 @@
                         <i class="fas fa-award"></i>
                         المسابقات الحالية
                     </h3>
-                    <a href="#competitions-full" class="view-all" onclick="showSection('competitions-full')">
+                    <a href="javascript:void(0)" class="view-all" onclick="showSection('competitions')">
                         عرض الكل
                         <i class="fas fa-arrow-left"></i>
                     </a>
                 </div>
                 
                 <div id="competitionsList">
-                    <!-- سيتم تعبئتها عبر JavaScript -->
+                    <div class="loading" style="padding: 40px 0;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Achievements Section -->
+        <section id="achievements" class="section">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h2 class="hero-title">إنجازات المعهد</h2>
+                    <p class="hero-subtitle">أبرز إنجازات طلابنا وإبداعاتهم</p>
+                </div>
+            </div>
+            
+            <div class="achievements-section">
+                <div id="fullAchievementsList" class="features-grid" style="grid-template-columns: 1fr; gap: 20px;">
+                    <div class="loading" style="padding: 40px 0;">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل الإنجازات...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Competitions Section -->
+        <section id="competitions" class="section">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h2 class="hero-title">المسابقات والفائزين</h2>
+                    <p class="hero-subtitle">مسابقاتنا الدورية وفائزينا المتميزين</p>
+                </div>
+            </div>
+            
+            <div class="competitions-section">
+                <div id="fullCompetitionsList">
+                    <div class="loading" style="padding: 40px 0;">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل المسابقات...</p>
+                    </div>
                 </div>
                 
-                <div id="competitionsLoading" class="loading">
-                    <div class="spinner"></div>
-                    <p>جاري تحميل المسابقات...</p>
-                </div>
+                <a href="/competitions" class="competition-btn" style="margin-top: 20px;">
+                    <i class="fas fa-external-link-alt"></i>
+                    عرض صفحة المسابقات الكاملة
+                </a>
             </div>
         </section>
 
         <!-- About Section -->
         <section id="about" class="section">
-            <a name="about"></a>
             <div class="about-section">
                 <div class="about-content">
                     <h3 class="about-title">عن معهد جيل الأمة</h3>
@@ -916,19 +1092,19 @@
                     <div class="about-features">
                         <div class="about-feature">
                             <i class="fas fa-book-open"></i>
-                            <h4>مناهج متطورة</h4>
-                            <p>مناهج دراسية معتمدة</p>
+                            <h4>مناهج قوية</h4>
+                            <p>مناهج دراسية قوية</p>
                         </div>
                         
                         <div class="about-feature">
                             <i class="fas fa-users"></i>
-                            <h4>فصول متخصصة</h4>
+                            <h4>فصول منظمة</h4>
                             <p>فصول حسب المستويات</p>
                         </div>
                         
                         <div class="about-feature">
                             <i class="fas fa-calendar-alt"></i>
-                            <h4>برامج منتظمة</h4>
+                            <h4>برامج  منتظمة</h4>
                             <p>برامج دراسية منتظمة</p>
                         </div>
                         
@@ -966,58 +1142,8 @@
             </div>
         </section>
 
-        <!-- Achievements Full Section -->
-        <section id="achievements-full" class="section">
-            <a name="achievements-full"></a>
-            <div class="hero-section" style="border-radius: 0 0 30px 30px; margin-bottom: 20px;">
-                <div class="hero-content">
-                    <h2 class="hero-title">إنجازات المعهد</h2>
-                    <p class="hero-subtitle">أبرز إنجازات طلابنا وإبداعاتهم</p>
-                </div>
-            </div>
-            
-            <div class="achievements-section">
-                <div id="fullAchievementsList" class="achievements-grid" style="grid-template-columns: 1fr;">
-                    <!-- سيتم تعبئتها عبر JavaScript -->
-                </div>
-                
-                <div id="fullAchievementsLoading" class="loading">
-                    <div class="spinner"></div>
-                    <p>جاري تحميل جميع الإنجازات...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Competitions Full Section -->
-        <section id="competitions-full" class="section">
-            <a name="competitions-full"></a>
-            <div class="hero-section" style="border-radius: 0 0 30px 30px; margin-bottom: 20px;">
-                <div class="hero-content">
-                    <h2 class="hero-title">المسابقات والفائزين</h2>
-                    <p class="hero-subtitle">مسابقاتنا الدورية وفائزينا المتميزين</p>
-                </div>
-            </div>
-            
-            <div class="competitions-section">
-                <div id="fullCompetitionsList">
-                    <!-- سيتم تعبئتها عبر JavaScript -->
-                </div>
-                
-                <div id="fullCompetitionsLoading" class="loading">
-                    <div class="spinner"></div>
-                    <p>جاري تحميل جميع المسابقات...</p>
-                </div>
-                
-                <a href="/competitions" class="competition-btn" style="margin-top: 20px;">
-                    <i class="fas fa-external-link-alt"></i>
-                    عرض صفحة المسابقات الكاملة
-                </a>
-            </div>
-        </section>
-
         <!-- Contact Section -->
         <section id="contact" class="section">
-            <a name="contact"></a>
             <div class="contact-section">
                 <h3 class="contact-title">اتصل بنا</h3>
                 
@@ -1098,27 +1224,27 @@
 
     <!-- Mobile Navigation -->
     <nav class="mobile-nav">
-        <a href="#home" class="nav-item active" onclick="showSection('home')">
+        <a href="javascript:void(0)" class="nav-item active" onclick="showSection('home')">
             <i class="fas fa-home nav-icon"></i>
             <span class="nav-label">الرئيسية</span>
         </a>
         
-        <a href="#achievements-full" class="nav-item" onclick="showSection('achievements-full')">
+        <a href="javascript:void(0)" class="nav-item" onclick="showSection('achievements')">
             <i class="fas fa-trophy nav-icon"></i>
             <span class="nav-label">الإنجازات</span>
         </a>
         
-        <a href="#competitions-full" class="nav-item" onclick="showSection('competitions-full')">
+        <a href="javascript:void(0)" class="nav-item" onclick="showSection('competitions')">
             <i class="fas fa-award nav-icon"></i>
             <span class="nav-label">المسابقات</span>
         </a>
         
-        <a href="#about" class="nav-item" onclick="showSection('about')">
+        <a href="javascript:void(0)" class="nav-item" onclick="showSection('about')">
             <i class="fas fa-info-circle nav-icon"></i>
             <span class="nav-label">عن المعهد</span>
         </a>
         
-        <a href="#contact" class="nav-item" onclick="showSection('contact')">
+        <a href="javascript:void(0)" class="nav-item" onclick="showSection('contact')">
             <i class="fas fa-phone nav-icon"></i>
             <span class="nav-label">اتصل بنا</span>
         </a>
@@ -1129,11 +1255,55 @@
         <i class="fas fa-arrow-up"></i>
     </div>
 
+    <!-- Achievement Detail Modal -->
+    <div class="modal-overlay" id="achievementModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalAchievementTitle"></h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="modalAchievementImage" src="" alt="" class="modal-image">
+                <p class="modal-description" id="modalAchievementDescription"></p>
+                
+                <div class="modal-stats">
+                    <div class="modal-stat">
+                        <i class="fas fa-heart"></i>
+                        <span id="modalLikesCount">0</span>
+                        <small>إعجاب</small>
+                    </div>
+                    <div class="modal-stat">
+                        <i class="fas fa-comment"></i>
+                        <span id="modalCommentsCount">0</span>
+                        <small>تعليق</small>
+                    </div>
+                    <div class="modal-stat">
+                        <i class="fas fa-calendar"></i>
+                        <span id="modalDate"></span>
+                    </div>
+                </div>
+                
+                <div class="modal-comments">
+                    <h4 class="comments-title">التعليقات</h4>
+                    <div id="modalCommentsList"></div>
+                    
+                    <div class="comment-form">
+                        <input type="text" id="commentUserName" class="comment-input" placeholder="اسمك">
+                        <textarea id="commentText" class="comment-input" placeholder="اكتب تعليقك..." rows="3"></textarea>
+                        <button class="comment-submit" onclick="addComment()">نشر التعليق</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // متغيرات عامة
         const API_URL = "/api";
         let currentStudent = null;
         let achievementsCache = null;
         let competitionsCache = null;
+        let currentAchievementId = null;
 
         // تهيئة التطبيق
         document.addEventListener('DOMContentLoaded', function() {
@@ -1141,6 +1311,10 @@
             loadAchievements();
             loadCompetitions();
             checkLoginStatus();
+            setupNavigation();
+            
+            // إظهار الصفحة الرئيسية افتراضياً
+            showSection('home');
         });
 
         // إعداد مستمعي الأحداث
@@ -1156,22 +1330,52 @@
             // إرسال رسالة اتصل بنا
             document.getElementById('sendMessageBtn').addEventListener('click', sendContactMessage);
 
-            // تغيير القسم النشط
-            window.addEventListener('hashchange', handleHashChange);
-
             // إظهار زر العودة للأعلى عند التمرير
             window.addEventListener('scroll', handleScroll);
 
-            // التنقل السلس بين الأقسام
-            setupSmoothNavigation();
+            // إغلاق المودال بالنقر خارج المحتوى
+            document.getElementById('achievementModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        }
+
+        // إعداد التنقل
+        function setupNavigation() {
+            // تحديث حالة الروابط النشطة
+            updateActiveNav();
+        }
+
+        // تحديث الروابط النشطة
+        function updateActiveNav() {
+            const sections = document.querySelectorAll('.section');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            sections.forEach(section => {
+                if (section.classList.contains('active')) {
+                    const sectionId = section.id;
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                        if (item.onclick && item.onclick.toString().includes(sectionId)) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            });
         }
 
         // التحقق من حالة تسجيل الدخول
         function checkLoginStatus() {
             const studentData = localStorage.getItem('currentStudent');
             if (studentData) {
-                currentStudent = JSON.parse(studentData);
-                updateUIForLoggedInUser();
+                try {
+                    currentStudent = JSON.parse(studentData);
+                    updateUIForLoggedInUser();
+                } catch (error) {
+                    console.error('Error parsing student data:', error);
+                    localStorage.removeItem('currentStudent');
+                }
             }
         }
 
@@ -1179,13 +1383,25 @@
         function updateUIForLoggedInUser() {
             if (currentStudent) {
                 const loginBtn = document.getElementById('loginBtn');
+                const studentName = currentStudent.name ? currentStudent.name.split(' ')[0] : 'طالب';
                 loginBtn.innerHTML = `
                     <i class="fas fa-user"></i>
-                    مرحباً ${currentStudent.name.split(' ')[0]}
+                    مرحباً ${studentName}
                 `;
                 loginBtn.onclick = function() {
                     window.location.href = '/student';
                 };
+                
+                // إظهار اسم الطالب في الهيدر
+                const instituteName = document.querySelector('.institute-name');
+                if (instituteName) {
+                    const welcomeText = document.createElement('p');
+                    welcomeText.className = 'welcome-text';
+                    welcomeText.style.fontSize = '0.8rem';
+                    welcomeText.style.opacity = '0.9';
+                    welcomeText.textContent = `مرحباً ${studentName}`;
+                    instituteName.appendChild(welcomeText);
+                }
             }
         }
 
@@ -1203,6 +1419,7 @@
             try {
                 loadingDiv.style.display = 'block';
                 document.getElementById('loginBtn').disabled = true;
+                document.getElementById('loginBtn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الدخول...';
 
                 const response = await fetch(`${API_URL}/students/login`, {
                     method: 'POST',
@@ -1227,6 +1444,7 @@
 
             } catch (error) {
                 showMessage(messageDiv, `❌ ${error.message}`, 'error');
+                document.getElementById('loginBtn').innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
             } finally {
                 loadingDiv.style.display = 'none';
                 document.getElementById('loginBtn').disabled = false;
@@ -1237,80 +1455,97 @@
         async function loadAchievements() {
             const carousel = document.getElementById('achievementsCarousel');
             const fullList = document.getElementById('fullAchievementsList');
-            const loading = document.getElementById('achievementsLoading');
-            const fullLoading = document.getElementById('fullAchievementsLoading');
 
             try {
                 if (!achievementsCache) {
                     const response = await fetch(`${API_URL}/achievements?limit=10`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch achievements');
+                    }
                     achievementsCache = await response.json();
                 }
 
                 // عرض أحدث 3 إنجازات في الكاروسيل
                 const latestAchievements = achievementsCache.slice(0, 3);
-                carousel.innerHTML = latestAchievements.map(achievement => `
-                    <div class="achievement-card" onclick="showAchievementDetail('${achievement._id}')">
-                        ${achievement.images && achievement.images.length > 0 ? `
-                            <img src="${achievement.images[0].url}" alt="${achievement.title}" class="achievement-image">
-                        ` : `
-                            <div class="achievement-image" style="background: linear-gradient(135deg, #57a895, #2c786c); display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-trophy" style="color: white; font-size: 3rem;"></i>
-                            </div>
-                        `}
-                        <div class="achievement-content">
-                            <h4 class="achievement-title">${achievement.title}</h4>
-                            <p class="achievement-desc">${achievement.description.substring(0, 100)}...</p>
-                            <div class="achievement-stats">
-                                <span><i class="fas fa-heart"></i> ${achievement.likes || 0}</span>
-                                <span><i class="fas fa-comment"></i> ${achievement.comments ? achievement.comments.length : 0}</span>
-                                <span>${formatDate(achievement.date)}</span>
+                if (latestAchievements.length > 0) {
+                    carousel.innerHTML = latestAchievements.map(achievement => `
+                        <div class="achievement-card" onclick="showAchievementDetail('${achievement._id}')">
+                            ${achievement.images && achievement.images.length > 0 ? `
+                                <img src="${achievement.images[0].url}" alt="${achievement.title}" class="achievement-image">
+                            ` : `
+                                <div class="achievement-image" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-trophy" style="color: white; font-size: 3rem;"></i>
+                                </div>
+                            `}
+                            <div class="achievement-content">
+                                <h4 class="achievement-title">${achievement.title}</h4>
+                                <p class="achievement-desc">${achievement.description.substring(0, 100)}...</p>
+                                <div class="achievement-stats">
+                                    <span><i class="fas fa-heart"></i> ${achievement.likes || 0}</span>
+                                    <span><i class="fas fa-comment"></i> ${achievement.comments ? achievement.comments.length : 0}</span>
+                                    <span>${formatDate(achievement.date)}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    `).join('');
+                } else {
+                    carousel.innerHTML = `
+                        <div class="achievement-card" style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-trophy" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+                            <p style="color: var(--text);">لا توجد إنجازات حالياً</p>
+                        </div>
+                    `;
+                }
 
                 // عرض جميع الإنجازات في القسم الكامل
-                fullList.innerHTML = achievementsCache.map(achievement => `
-                    <div class="achievement-card" onclick="showAchievementDetail('${achievement._id}')">
-                        ${achievement.images && achievement.images.length > 0 ? `
-                            <img src="${achievement.images[0].url}" alt="${achievement.title}" class="achievement-image">
-                        ` : `
-                            <div class="achievement-image" style="background: linear-gradient(135deg, #57a895, #2c786c); display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-trophy" style="color: white; font-size: 3rem;"></i>
-                            </div>
-                        `}
-                        <div class="achievement-content">
-                            <h4 class="achievement-title">${achievement.title}</h4>
-                            <p class="achievement-desc">${achievement.description}</p>
-                            <div class="achievement-stats">
-                                <span><i class="fas fa-heart"></i> ${achievement.likes || 0}</span>
-                                <span><i class="fas fa-comment"></i> ${achievement.comments ? achievement.comments.length : 0}</span>
-                                <span><i class="fas fa-images"></i> ${achievement.images ? achievement.images.length : 0}</span>
-                                <span>${formatDate(achievement.date)}</span>
+                if (achievementsCache.length > 0) {
+                    fullList.innerHTML = achievementsCache.map(achievement => `
+                        <div class="achievement-card" onclick="showAchievementDetail('${achievement._id}')">
+                            ${achievement.images && achievement.images.length > 0 ? `
+                                <img src="${achievement.images[0].url}" alt="${achievement.title}" class="achievement-image">
+                            ` : `
+                                <div class="achievement-image" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-trophy" style="color: white; font-size: 3rem;"></i>
+                                </div>
+                            `}
+                            <div class="achievement-content">
+                                <h4 class="achievement-title">${achievement.title}</h4>
+                                <p class="achievement-desc">${achievement.description}</p>
+                                <div class="achievement-stats">
+                                    <span><i class="fas fa-heart"></i> ${achievement.likes || 0}</span>
+                                    <span><i class="fas fa-comment"></i> ${achievement.comments ? achievement.comments.length : 0}</span>
+                                    <span><i class="fas fa-images"></i> ${achievement.images ? achievement.images.length : 0}</span>
+                                    <span>${formatDate(achievement.date)}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
-
-                loading.style.display = 'none';
-                fullLoading.style.display = 'none';
+                    `).join('');
+                } else {
+                    fullList.innerHTML = `
+                        <div class="achievement-card" style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-trophy" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+                            <h4 style="color: var(--primary-dark); margin-bottom: 10px;">لا توجد إنجازات</h4>
+                            <p style="color: var(--text);">سيتم إضافة الإنجازات قريباً</p>
+                        </div>
+                    `;
+                }
 
             } catch (error) {
                 console.error('Error loading achievements:', error);
                 carousel.innerHTML = `
-                    <div class="achievements-placeholder">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>حدث خطأ في تحميل الإنجازات</p>
+                    <div class="achievement-card" style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 15px;"></i>
+                        <p style="color: var(--text);">حدث خطأ في تحميل الإنجازات</p>
+                        <button onclick="loadAchievements()" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; margin-top: 10px; cursor: pointer;">إعادة المحاولة</button>
                     </div>
                 `;
                 fullList.innerHTML = `
-                    <div class="achievements-placeholder">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>حدث خطأ في تحميل الإنجازات</p>
+                    <div class="achievement-card" style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 15px;"></i>
+                        <p style="color: var(--text);">حدث خطأ في تحميل الإنجازات</p>
+                        <button onclick="loadAchievements()" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; margin-top: 10px; cursor: pointer;">إعادة المحاولة</button>
                     </div>
                 `;
-                loading.style.display = 'none';
-                fullLoading.style.display = 'none';
             }
         }
 
@@ -1318,73 +1553,90 @@
         async function loadCompetitions() {
             const list = document.getElementById('competitionsList');
             const fullList = document.getElementById('fullCompetitionsList');
-            const loading = document.getElementById('competitionsLoading');
-            const fullLoading = document.getElementById('fullCompetitionsLoading');
 
             try {
                 if (!competitionsCache) {
                     const response = await fetch(`${API_URL}/competitions?limit=5`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch competitions');
+                    }
                     competitionsCache = await response.json();
                 }
 
                 // عرض آخر مسابقتين في الصفحة الرئيسية
                 const latestCompetitions = competitionsCache.slice(0, 2);
-                list.innerHTML = latestCompetitions.map(competition => `
-                    <div class="competition-card">
-                        <div class="competition-header">
-                            <h4 class="competition-title">${competition.title}</h4>
-                            <span class="competition-status ${competition.status}">${competition.status}</span>
+                if (latestCompetitions.length > 0) {
+                    list.innerHTML = latestCompetitions.map(competition => `
+                        <div class="competition-card">
+                            <div class="competition-header">
+                                <h4 class="competition-title">${competition.title}</h4>
+                                <span class="competition-status ${competition.status}">${competition.status}</span>
+                            </div>
+                            <div class="competition-details">
+                                <p><i class="fas fa-calendar"></i> ${formatDate(competition.date)}</p>
+                                ${competition.location ? `<p><i class="fas fa-map-marker-alt"></i> ${competition.location}</p>` : ''}
+                                ${competition.description ? `<p>${competition.description.substring(0, 80)}...</p>` : ''}
+                            </div>
+                            <a href="/competitions" class="competition-btn">عرض التفاصيل</a>
                         </div>
-                        <div class="competition-details">
-                            <p><i class="fas fa-calendar"></i> ${formatDate(competition.date)}</p>
-                            ${competition.location ? `<p><i class="fas fa-map-marker-alt"></i> ${competition.location}</p>` : ''}
-                            ${competition.description ? `<p>${competition.description.substring(0, 80)}...</p>` : ''}
+                    `).join('');
+                } else {
+                    list.innerHTML = `
+                        <div class="competition-card" style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-award" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+                            <p style="color: var(--text);">لا توجد مسابقات حالياً</p>
                         </div>
-                        <a href="/competitions" class="competition-btn">عرض التفاصيل</a>
-                    </div>
-                `).join('');
+                    `;
+                }
 
                 // عرض جميع المسابقات في القسم الكامل
-                fullList.innerHTML = competitionsCache.map(competition => `
-                    <div class="competition-card">
-                        <div class="competition-header">
-                            <h4 class="competition-title">${competition.title}</h4>
-                            <span class="competition-status ${competition.status}">${competition.status}</span>
+                if (competitionsCache.length > 0) {
+                    fullList.innerHTML = competitionsCache.map(competition => `
+                        <div class="competition-card">
+                            <div class="competition-header">
+                                <h4 class="competition-title">${competition.title}</h4>
+                                <span class="competition-status ${competition.status}">${competition.status}</span>
+                            </div>
+                            <div class="competition-details">
+                                <p><strong>نوع المسابقة:</strong> ${competition.type}</p>
+                                <p><i class="fas fa-calendar"></i> ${formatDate(competition.date)} ${competition.endDate ? ` - ${formatDate(competition.endDate)}` : ''}</p>
+                                ${competition.location ? `<p><i class="fas fa-map-marker-alt"></i> ${competition.location}</p>` : ''}
+                                ${competition.description ? `<p>${competition.description}</p>` : ''}
+                                ${competition.participantsCount ? `<p><i class="fas fa-users"></i> ${competition.participantsCount} مشارك</p>` : ''}
+                            </div>
+                            <a href="/competitions" class="competition-btn">عرض التفاصيل والفائزين</a>
                         </div>
-                        <div class="competition-details">
-                            <p><strong>نوع المسابقة:</strong> ${competition.type}</p>
-                            <p><i class="fas fa-calendar"></i> ${formatDate(competition.date)} ${competition.endDate ? ` - ${formatDate(competition.endDate)}` : ''}</p>
-                            ${competition.location ? `<p><i class="fas fa-map-marker-alt"></i> ${competition.location}</p>` : ''}
-                            ${competition.description ? `<p>${competition.description}</p>` : ''}
-                            ${competition.participantsCount ? `<p><i class="fas fa-users"></i> ${competition.participantsCount} مشارك</p>` : ''}
+                    `).join('');
+                } else {
+                    fullList.innerHTML = `
+                        <div class="competition-card" style="text-align: center; padding: 40px 20px;">
+                            <i class="fas fa-award" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+                            <h4 style="color: var(--primary-dark); margin-bottom: 10px;">لا توجد مسابقات</h4>
+                            <p style="color: var(--text);">سيتم إضافة المسابقات قريباً</p>
                         </div>
-                        <a href="/competitions" class="competition-btn">عرض التفاصيل والفائزين</a>
-                    </div>
-                `).join('');
-
-                loading.style.display = 'none';
-                fullLoading.style.display = 'none';
+                    `;
+                }
 
             } catch (error) {
                 console.error('Error loading competitions:', error);
                 list.innerHTML = `
-                    <div class="achievements-placeholder">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>حدث خطأ في تحميل المسابقات</p>
+                    <div class="competition-card" style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 15px;"></i>
+                        <p style="color: var(--text);">حدث خطأ في تحميل المسابقات</p>
+                        <button onclick="loadCompetitions()" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; margin-top: 10px; cursor: pointer;">إعادة المحاولة</button>
                     </div>
                 `;
                 fullList.innerHTML = `
-                    <div class="achievements-placeholder">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>حدث خطأ في تحميل المسابقات</p>
+                    <div class="competition-card" style="text-align: center; padding: 40px 20px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff9800; margin-bottom: 15px;"></i>
+                        <p style="color: var(--text);">حدث خطأ في تحميل المسابقات</p>
+                        <button onclick="loadCompetitions()" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; margin-top: 10px; cursor: pointer;">إعادة المحاولة</button>
                     </div>
                 `;
-                loading.style.display = 'none';
-                fullLoading.style.display = 'none';
             }
         }
 
-        // إظهار قسم معين وإخفاء الآخرين
+        // إظهار قسم معين
         function showSection(sectionId) {
             // إخفاء جميع الأقسام
             document.querySelectorAll('.section').forEach(section => {
@@ -1397,17 +1649,13 @@
                 targetSection.classList.add('active');
                 
                 // تحديث الروابط في الـ navigation
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                const navItem = document.querySelector(`.nav-item[href="#${sectionId}"]`);
-                if (navItem) {
-                    navItem.classList.add('active');
-                }
+                updateActiveNav();
 
                 // التمرير إلى الأعلى
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // تحديث العنوان في المتصفح
+                window.history.pushState(null, null, `#${sectionId}`);
             }
         }
 
@@ -1429,18 +1677,15 @@
             }
 
             try {
-                // في الإصدار الحقيقي، هنا سيتم إرسال الرسالة للخادم
-                // سأستخدم هنا تخزين محلي للعرض التوضيحي
-                
-                // محاكاة الإرسال
                 const contactBtn = document.getElementById('sendMessageBtn');
                 const originalText = contactBtn.innerHTML;
                 contactBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
                 contactBtn.disabled = true;
 
+                // محاكاة الإرسال (في الإصدار الحقيقي، سيتم إرسالها للخادم)
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
-                // حفظ الرسالة محلياً للعرض التوضيحي
+                // تخزين الرسالة محلياً للعرض التوضيحي
                 const contactMessage = {
                     name,
                     email,
@@ -1448,7 +1693,6 @@
                     date: new Date().toISOString()
                 };
 
-                // الحصول على الرسائل المخزنة أو إنشاء مصفوفة جديدة
                 let messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
                 messages.push(contactMessage);
                 localStorage.setItem('contactMessages', JSON.stringify(messages));
@@ -1471,6 +1715,128 @@
             }
         }
 
+        // إظهار تفاصيل الإنجاز
+        async function showAchievementDetail(achievementId) {
+            try {
+                const response = await fetch(`${API_URL}/achievements/${achievementId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch achievement details');
+                }
+                
+                const achievement = await response.json();
+                currentAchievementId = achievementId;
+                
+                // تعبئة البيانات في المودال
+                document.getElementById('modalAchievementTitle').textContent = achievement.title;
+                document.getElementById('modalAchievementDescription').textContent = achievement.description;
+                document.getElementById('modalLikesCount').textContent = achievement.likes || 0;
+                document.getElementById('modalCommentsCount').textContent = achievement.comments ? achievement.comments.length : 0;
+                document.getElementById('modalDate').textContent = formatDate(achievement.date);
+                
+                if (achievement.images && achievement.images.length > 0) {
+                    document.getElementById('modalAchievementImage').src = achievement.images[0].url;
+                    document.getElementById('modalAchievementImage').style.display = 'block';
+                } else {
+                    document.getElementById('modalAchievementImage').style.display = 'none';
+                }
+                
+                // عرض التعليقات
+                const commentsList = document.getElementById('modalCommentsList');
+                if (achievement.comments && achievement.comments.length > 0) {
+                    commentsList.innerHTML = achievement.comments.map(comment => `
+                        <div class="comment-item">
+                            <div class="comment-user">${comment.user}</div>
+                            <div class="comment-text">${comment.comment}</div>
+                            <div class="comment-date">${formatDate(comment.date)}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    commentsList.innerHTML = '<p style="text-align: center; color: var(--text); padding: 20px;">لا توجد تعليقات</p>';
+                }
+                
+                // إظهار المودال
+                document.getElementById('achievementModal').style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error showing achievement detail:', error);
+                alert('حدث خطأ في تحميل تفاصيل الإنجاز');
+            }
+        }
+
+        // إضافة تعليق
+        async function addComment() {
+            if (!currentStudent) {
+                alert('يجب تسجيل الدخول لإضافة تعليق');
+                return;
+            }
+
+            const userName = document.getElementById('commentUserName').value.trim();
+            const commentText = document.getElementById('commentText').value.trim();
+
+            if (!userName || !commentText) {
+                alert('الرجاء إدخال الاسم والتعليق');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/achievements/${currentAchievementId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user: userName,
+                        comment: commentText
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to add comment');
+                }
+
+                const newComment = await response.json();
+                
+                // إضافة التعليق الجديد للقائمة
+                const commentsList = document.getElementById('modalCommentsList');
+                const commentItem = document.createElement('div');
+                commentItem.className = 'comment-item';
+                commentItem.innerHTML = `
+                    <div class="comment-user">${newComment.user}</div>
+                    <div class="comment-text">${newComment.comment}</div>
+                    <div class="comment-date">${formatDate(newComment.date)}</div>
+                `;
+                commentsList.insertBefore(commentItem, commentsList.firstChild);
+                
+                // تحديث عدد التعليقات
+                const commentsCount = parseInt(document.getElementById('modalCommentsCount').textContent);
+                document.getElementById('modalCommentsCount').textContent = commentsCount + 1;
+                
+                // مسح الحقول
+                document.getElementById('commentUserName').value = '';
+                document.getElementById('commentText').value = '';
+                
+                // تحديث الذاكرة المؤقتة
+                if (achievementsCache) {
+                    const achievementIndex = achievementsCache.findIndex(a => a._id === currentAchievementId);
+                    if (achievementIndex !== -1) {
+                        if (!achievementsCache[achievementIndex].comments) {
+                            achievementsCache[achievementIndex].comments = [];
+                        }
+                        achievementsCache[achievementIndex].comments.unshift(newComment);
+                    }
+                }
+                
+                alert('تم إضافة التعليق بنجاح');
+                
+            } catch (error) {
+                console.error('Error adding comment:', error);
+                alert('حدث خطأ في إضافة التعليق');
+            }
+        }
+
+        // إغلاق المودال
+        function closeModal() {
+            document.getElementById('achievementModal').style.display = 'none';
+        }
+
         // التحقق من صحة البريد الإلكتروني
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1479,9 +1845,16 @@
 
         // تنسيق التاريخ
         function formatDate(dateString) {
-            const date = new Date(dateString);
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString('ar-EG', options);
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) {
+                    return 'تاريخ غير محدد';
+                }
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('ar-EG', options);
+            } catch (error) {
+                return 'تاريخ غير محدد';
+            }
         }
 
         // إظهار رسالة
@@ -1493,32 +1866,6 @@
             setTimeout(() => {
                 element.style.display = 'none';
             }, 5000);
-        }
-
-        // التعامل مع تغيير الـ hash
-        function handleHashChange() {
-            const hash = window.location.hash.substring(1);
-            if (hash) {
-                showSection(hash);
-            } else {
-                showSection('home');
-            }
-        }
-
-        // إعداد التنقل السلس
-        function setupSmoothNavigation() {
-            // جعل جميع روابط التنقل تعمل بسلاسة
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    const href = this.getAttribute('href');
-                    if (href !== '#') {
-                        e.preventDefault();
-                        const targetId = href.substring(1);
-                        showSection(targetId);
-                        window.history.pushState(null, null, href);
-                    }
-                });
-            });
         }
 
         // التعامل مع التمرير
@@ -1539,34 +1886,23 @@
             });
         }
 
-        // عرض تفاصيل الإنجاز (يمكن توسيعها لاحقاً)
-        function showAchievementDetail(achievementId) {
-            // في الإصدار المستقبلي، يمكن فتح نافذة منبثقة أو صفحة تفاصيل
-            alert('سيتم تطوير صفحة تفاصيل الإنجاز قريباً');
-        }
-
-        // تحديث حالة الزر بناءً على وجود المستخدم المسجل
-        function updateLoginButton() {
-            const student = localStorage.getItem('currentStudent');
-            const loginBtn = document.getElementById('loginBtn');
-            
-            if (student) {
-                const studentData = JSON.parse(student);
-                loginBtn.innerHTML = `
-                    <i class="fas fa-user"></i>
-                    مرحباً ${studentData.name.split(' ')[0]}
-                `;
-                loginBtn.onclick = function() {
-                    window.location.href = '/student';
-                };
+        // التعامل مع حالة المتصفح الأمامي/الخلفي
+        window.addEventListener('popstate', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                showSection(hash);
+            } else {
+                showSection('home');
             }
-        }
+        });
 
-        // عند تحميل الصفحة
-        window.onload = function() {
-            updateLoginButton();
-            handleHashChange();
-        };
+        // إعادة تحميل البيانات عند العودة للصفحة
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                // الصفحة أصبحت مرئية
+                checkLoginStatus();
+            }
+        });
     </script>
 </body>
 </html>
