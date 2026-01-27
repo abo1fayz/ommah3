@@ -3,166 +3,777 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول - معهد جيل الأمة</title>
+  <title>معهد جيل الأمة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* الحفاظ على التنسيقات الموجودة وإضافة الجديد */
+    :root {
+      --primary-color: #2c786c;
+      --secondary-color: #004445;
+      --accent-color: #f8b400;
+      --light-bg: #faf5e4;
+    }
+
     body {
       font-family: 'Tajawal', sans-serif;
-      background-color: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       margin: 0;
-      padding: 20px 0;
+      padding: 0;
+      background-color: #f5f5f5;
     }
-    .login-container {
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      width: 350px;
+
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .header p {
+      margin: 10px 0 0;
+      opacity: 0.9;
+    }
+
+    .nav {
+      background: white;
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-link {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover {
+      background: rgba(44, 120, 108, 0.1);
+    }
+
+    .hero-section {
+      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('background.jpg');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      padding: 80px 20px;
       text-align: center;
     }
-    .logo img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      border: 3px solid #2c786c;
-      object-fit: cover;
-      margin-bottom: 20px;
-    }
-    h1 {
-      color: #2c786c;
-      margin-bottom: 20px;
-    }
-    .form-group {
-      margin-bottom: 20px;
-      text-align: right;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    button {
-      background-color: #2c786c;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 5px;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #004445;
-    }
-    .message {
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 5px;
-      display: none;
-    }
-    .error {
-      background-color: #ffebee;
-      color: #c62828;
-      border-left: 4px solid #c62828;
-    }
-    .success {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-      border-left: 4px solid #2e7d32;
-    }
-    .loading {
-      display: none;
-      margin-top: 20px;
-    }
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid rgba(0, 0, 0, 0.1);
-      border-radius: 50%;
-      border-top-color: #2c786c;
-      animation: spin 1s linear infinite;
+
+    .hero-content {
+      max-width: 800px;
       margin: 0 auto;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
     }
-    .competitions-link {
-      display: inline-block;
-      background-color: #f8b400;
-      color: white;
-      padding: 12px 24px;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      margin-top: 20px;
-      transition: background-color 0.3s;
+
+    .section-title {
+      color: var(--secondary-color);
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+      padding-bottom: 15px;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 50%;
+      transform: translateX(50%);
+      width: 100px;
+      height: 3px;
+      background: var(--accent-color);
+    }
+
+    /* تنسيقات قسم الإنجازات */
+    .achievements-section {
+      margin: 60px 0;
+    }
+
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .achievement-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .achievement-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .achievement-image {
       width: 100%;
-      box-sizing: border-box;
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .achievement-content {
+      padding: 20px;
+    }
+
+    .achievement-title {
+      color: var(--secondary-color);
+      margin: 0 0 10px;
+      font-size: 1.3rem;
+    }
+
+    .achievement-description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .achievement-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+
+    .achievement-actions {
+      display: flex;
+      gap: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+      transition: color 0.3s;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
+
+    .action-btn:hover {
+      background: rgba(44, 120, 108, 0.1);
+    }
+
+    .action-btn.liked {
+      color: #e74c3c;
+    }
+
+    .action-btn.comment {
+      color: var(--primary-color);
+    }
+
+    .comments-section {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .comments-section.expanded {
+      max-height: 500px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+
+    .comment-form {
+      margin-top: 15px;
+      display: none;
+    }
+
+    .comment-form.expanded {
+      display: block;
+    }
+
+    .comment-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .comment-submit {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .comments-list {
+      margin-top: 15px;
+    }
+
+    .comment-item {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border-right: 3px solid var(--primary-color);
+    }
+
+    .comment-user {
+      font-weight: bold;
+      color: var(--secondary-color);
+      margin-bottom: 5px;
+    }
+
+    .comment-text {
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .comment-date {
+      font-size: 0.8rem;
+      color: #999;
+      text-align: left;
+      margin-top: 5px;
+    }
+
+    .image-gallery {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+    }
+
+    .gallery-image {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .gallery-image:hover {
+      transform: scale(1.05);
+    }
+
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-image {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+      background: rgba(0,0,0,0.5);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* تنسيقات الـ loader */
+    .loader {
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* زر مشاهدة المزيد */
+    .view-all-btn {
+      display: block;
+      margin: 40px auto;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      width: fit-content;
+    }
+
+    .view-all-btn:hover {
+      background: var(--secondary-color);
+    }
+
+    /* الفوتر */
+    .footer {
+      background: var(--secondary-color);
+      color: white;
+      padding: 40px 20px;
+      margin-top: 60px;
       text-align: center;
     }
-    .competitions-link:hover {
-      background-color: #e6a200;
-      transform: translateY(-2px);
+
+    .login-section {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      max-width: 400px;
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    .login-section h2 {
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .achievements-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <div class="logo">
-      <img src="photo_2025-09-27_14-01-40.jpg" alt="شعار المعهد">
-    </div>
-    <h1>تسجيل الدخول للطالب</h1>
-
-    <div class="form-group">
-      <label for="studentCode">كود الدخول</label>
-      <input type="text" id="studentCode" placeholder="أدخل الكود المكون من 6 أرقام" maxlength="6">
-    </div>
-
-    <button id="loginBtn">دخول</button>
-
-    <!-- زر المسابقات الجديد -->
-    <a href="competitions" class="competitions-link">
-      🏆 المسابقات والفائزين
-    </a>
-
-    <div id="message" class="message"></div>
-    <div id="loading" class="loading">
-      <div class="spinner"></div>
-    </div>
+  <!-- الهيدر -->
+  <div class="header">
+    <h1>معهد جيل الأمة</h1>
+    <p>نور العلم والإيمان</p>
   </div>
 
+  <!-- التنقل -->
+  <nav class="nav">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <h2 style="color: var(--primary-color); margin: 0;">جيل الأمة</h2>
+      </div>
+      <div class="nav-links">
+        <a href="#home" class="nav-link">الرئيسية</a>
+        <a href="#achievements" class="nav-link">الإنجازات</a>
+        <a href="/competitions" class="nav-link">المسابقات</a>
+        <a href="#about" class="nav-link">عن المعهد</a>
+        <a href="#contact" class="nav-link">اتصل بنا</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- قسم البطل -->
+  <section class="hero-section" id="home">
+    <div class="hero-content">
+      <h1 style="font-size: 2.5rem; margin-bottom: 20px;">مرحباً بكم في معهد جيل الأمة</h1>
+      <p style="font-size: 1.2rem; margin-bottom: 30px;">معهد متخصص في تعليم القرآن الكريم والعلوم الشرعية</p>
+      <a href="#login" class="view-all-btn" style="background: var(--accent-color);">تسجيل الدخول للطلاب</a>
+    </div>
+  </section>
+
+  <!-- المحتوى الرئيسي -->
+  <div class="main-container">
+    
+    <!-- قسم الإنجازات -->
+    <section class="achievements-section" id="achievements">
+      <h2 class="section-title">إنجازات المعهد</h2>
+      <div id="achievementsContainer" class="achievements-grid">
+        <!-- سيتم تعبئة الإنجازات هنا عبر JavaScript -->
+      </div>
+      <div id="achievementsLoader" class="loader">
+        <div class="spinner"></div>
+      </div>
+      <a href="/achievements" class="view-all-btn">مشاهدة جميع الإنجازات</a>
+    </section>
+
+    <!-- قسم تسجيل الدخول -->
+    <section id="login" class="login-section">
+      <h2>تسجيل الدخول للطلاب</h2>
+      <div class="form-group">
+        <label for="studentCode" style="display: block; text-align: right; margin-bottom: 8px; color: #333;">كود الدخول</label>
+        <input type="text" id="studentCode" placeholder="أدخل الكود المكون من 6 أرقام" maxlength="6" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; box-sizing: border-box;">
+      </div>
+      <button id="loginBtn" style="background-color: #2c786c; color: white; border: none; padding: 12px; border-radius: 5px; width: 100%; font-size: 16px; cursor: pointer; transition: background-color 0.3s; margin-top: 20px;">دخول</button>
+      
+      <!-- زر المسابقات -->
+      <a href="/competitions" class="view-all-btn" style="display: block; margin-top: 20px; background: var(--accent-color); text-decoration: none;">
+        🏆 المسابقات والفائزين
+      </a>
+      
+      <div id="message" style="margin-top: 20px; padding: 10px; border-radius: 5px; display: none;"></div>
+    </section>
+  </div>
+
+  <!-- مودال الصورة -->
+  <div class="image-modal" id="imageModal">
+    <span class="close-modal" onclick="closeImageModal()">&times;</span>
+    <img class="modal-image" id="modalImage" src="" alt="صورة مكبرة">
+  </div>
+
+  <!-- الفوتر -->
+  <footer class="footer">
+    <p>© 2024 معهد جيل الأمة. جميع الحقوق محفوظة.</p>
+    <p>contact@jilalomah.edu | هاتف: 01123456789</p>
+  </footer>
+
   <script>
-    // ✅ تعديل الرابط ليضرب على المسار النسبي
-    const API_URL = "/api/students/login";
+    const API_URL = "/api";
+    let achievementsData = [];
+    let currentExpandedAchievement = null;
 
-    function showMessage(text, type) {
-      const messageDiv = document.getElementById("message");
-      messageDiv.textContent = text;
-      messageDiv.className = "message " + type;
-      messageDiv.style.display = "block";
+    // تحميل الإنجازات عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchAchievements();
+      setupEventListeners();
+    });
 
-      setTimeout(() => {
-        messageDiv.style.display = "none";
-      }, 4000);
+    // إعداد مستمعي الأحداث
+    function setupEventListeners() {
+      // تسجيل الدخول
+      document.getElementById('loginBtn').addEventListener('click', handleLogin);
+      document.getElementById('studentCode').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          handleLogin();
+        }
+      });
     }
 
-    document.getElementById("loginBtn").addEventListener("click", async () => {
+    // جلب الإنجازات من API
+    async function fetchAchievements() {
+      try {
+        const response = await fetch(`${API_URL}/achievements?limit=6`);
+        achievementsData = await response.json();
+        renderAchievements(achievementsData.slice(0, 6)); // عرض أول 6 إنجازات فقط
+        document.getElementById('achievementsLoader').style.display = 'none';
+      } catch (error) {
+        console.error('Error fetching achievements:', error);
+        document.getElementById('achievementsContainer').innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+            <h3>حدث خطأ في تحميل الإنجازات</h3>
+            <button onclick="fetchAchievements()" style="background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">إعادة المحاولة</button>
+          </div>
+        `;
+      }
+    }
+
+    // عرض الإنجازات
+    function renderAchievements(achievements) {
+      const container = document.getElementById('achievementsContainer');
+      container.innerHTML = '';
+
+      if (achievements.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">
+            <i class="fas fa-trophy" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+            <h3>لا توجد إنجازات حالياً</h3>
+            <p>سيتم إضافة الإنجازات قريباً</p>
+          </div>
+        `;
+        return;
+      }
+
+      achievements.forEach(achievement => {
+        const achievementCard = document.createElement('div');
+        achievementCard.className = 'achievement-card';
+        achievementCard.innerHTML = createAchievementHTML(achievement);
+        container.appendChild(achievementCard);
+      });
+    }
+
+    // إنشاء HTML للإنجاز
+    function createAchievementHTML(achievement) {
+      const hasMultipleImages = achievement.images && achievement.images.length > 1;
+      const mainImage = achievement.images && achievement.images.length > 0 
+        ? achievement.images[0].url 
+        : 'https://via.placeholder.com/400x250?text=No+Image';
+      
+      const isLiked = achievement.likedBy && achievement.likedBy.includes(getUserId());
+      const userId = getUserId();
+      
+      return `
+        <div class="achievement-content">
+          ${hasMultipleImages ? `
+            <div class="image-gallery">
+              ${achievement.images.slice(0, 4).map(img => `
+                <img src="${img.url}" alt="${achievement.title}" class="gallery-image" onclick="openImageModal('${img.url}')">
+              `).join('')}
+              ${achievement.images.length > 4 ? `<div style="width: 100px; height: 100px; background: #f0f0f0; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #666; font-weight: bold;">+${achievement.images.length - 4}</div>` : ''}
+            </div>
+          ` : `
+            <img src="${mainImage}" alt="${achievement.title}" class="achievement-image" onclick="openImageModal('${mainImage}')">
+          `}
+          
+          <h3 class="achievement-title">${achievement.title}</h3>
+          <p class="achievement-description">${achievement.description}</p>
+          
+          <div class="achievement-meta">
+            <span><i class="far fa-calendar"></i> ${formatDate(achievement.date)}</span>
+            ${achievement.tags && achievement.tags.length > 0 ? `
+              <span><i class="fas fa-tags"></i> ${achievement.tags.slice(0, 2).join(', ')}</span>
+            ` : ''}
+          </div>
+          
+          <div class="achievement-actions">
+            <button class="action-btn like-btn ${isLiked ? 'liked' : ''}" 
+                    onclick="toggleLike('${achievement._id}')"
+                    ${!userId ? 'disabled title="يجب تسجيل الدخول للإعجاب"' : ''}>
+              <i class="${isLiked ? 'fas' : 'far'} fa-heart"></i>
+              <span class="like-count">${achievement.likes || 0}</span>
+            </button>
+            
+            <button class="action-btn comment" onclick="toggleComments('${achievement._id}')">
+              <i class="far fa-comment"></i>
+              <span class="comment-count">${achievement.comments ? achievement.comments.length : 0}</span>
+            </button>
+          </div>
+          
+          <div class="comments-section" id="comments-${achievement._id}">
+            <div class="comments-list" id="comments-list-${achievement._id}">
+              ${renderComments(achievement.comments)}
+            </div>
+            
+            <div class="comment-form" id="comment-form-${achievement._id}">
+              <input type="text" class="comment-input" id="comment-input-${achievement._id}" 
+                     placeholder="اكتب تعليقك هنا..." 
+                     ${!userId ? 'disabled placeholder="يجب تسجيل الدخول للتعليق"' : ''}>
+              <button class="comment-submit" onclick="addComment('${achievement._id}')"
+                      ${!userId ? 'disabled' : ''}>نشر</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // عرض التعليقات
+    function renderComments(comments) {
+      if (!comments || comments.length === 0) {
+        return '<p style="color: #999; text-align: center; padding: 10px;">لا توجد تعليقات</p>';
+      }
+      
+      return comments.slice(0, 3).map(comment => `
+        <div class="comment-item">
+          <div class="comment-user">${comment.user}</div>
+          <div class="comment-text">${comment.comment}</div>
+          <div class="comment-date">${formatDate(comment.date)}</div>
+        </div>
+      `).join('');
+    }
+
+    // التبديل بين عرض/إخفاء التعليقات
+    function toggleComments(achievementId) {
+      const commentsSection = document.getElementById(`comments-${achievementId}`);
+      const commentForm = document.getElementById(`comment-form-${achievementId}`);
+      
+      if (currentExpandedAchievement && currentExpandedAchievement !== achievementId) {
+        const prevSection = document.getElementById(`comments-${currentExpandedAchievement}`);
+        const prevForm = document.getElementById(`comment-form-${currentExpandedAchievement}`);
+        if (prevSection) prevSection.classList.remove('expanded');
+        if (prevForm) prevForm.classList.remove('expanded');
+      }
+      
+      commentsSection.classList.toggle('expanded');
+      commentForm.classList.toggle('expanded');
+      currentExpandedAchievement = commentsSection.classList.contains('expanded') ? achievementId : null;
+    }
+
+    // الإعجاب/عدم الإعجاب
+    async function toggleLike(achievementId) {
+      const userId = getUserId();
+      if (!userId) {
+        showMessage('يجب تسجيل الدخول للإعجاب', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/achievements/${achievementId}/like`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // تحديث العداد في الواجهة
+          const likeBtn = document.querySelector(`#comments-${achievementId}`).previousElementSibling.querySelector('.like-btn');
+          const likeCount = likeBtn.querySelector('.like-count');
+          
+          likeCount.textContent = data.likes;
+          if (data.liked) {
+            likeBtn.classList.add('liked');
+            likeBtn.querySelector('i').className = 'fas fa-heart';
+          } else {
+            likeBtn.classList.remove('liked');
+            likeBtn.querySelector('i').className = 'far fa-heart';
+          }
+        }
+      } catch (error) {
+        console.error('Error toggling like:', error);
+      }
+    }
+
+    // إضافة تعليق
+    async function addComment(achievementId) {
+      const userId = getUserId();
+      if (!userId) {
+        showMessage('يجب تسجيل الدخول للتعليق', 'error');
+        return;
+      }
+      
+      const commentInput = document.getElementById(`comment-input-${achievementId}`);
+      const comment = commentInput.value.trim();
+      
+      if (!comment) {
+        showMessage('الرجاء كتابة تعليق', 'error');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/achievements/${achievementId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            user: userId, 
+            comment 
+          })
+        });
+        
+        if (response.ok) {
+          const newComment = await response.json();
+          commentInput.value = '';
+          
+          // تحديث قائمة التعليقات
+          const commentsList = document.getElementById(`comments-list-${achievementId}`);
+          const commentsHTML = `
+            <div class="comment-item">
+              <div class="comment-user">${newComment.user}</div>
+              <div class="comment-text">${newComment.comment}</div>
+              <div class="comment-date">${formatDate(newComment.date)}</div>
+            </div>
+          `;
+          commentsList.innerHTML = commentsHTML + commentsList.innerHTML;
+          
+          // تحديث عدد التعليقات
+          const commentBtn = document.querySelector(`#comments-${achievementId}`).previousElementSibling.querySelector('.comment');
+          const commentCount = commentBtn.querySelector('.comment-count');
+          commentCount.textContent = parseInt(commentCount.textContent) + 1;
+        }
+      } catch (error) {
+        console.error('Error adding comment:', error);
+        showMessage('حدث خطأ أثناء إضافة التعليق', 'error');
+      }
+    }
+
+    // فتح مودال الصورة
+    function openImageModal(imageUrl) {
+      document.getElementById('modalImage').src = imageUrl;
+      document.getElementById('imageModal').style.display = 'flex';
+    }
+
+    // إغلاق مودال الصورة
+    function closeImageModal() {
+      document.getElementById('imageModal').style.display = 'none';
+    }
+
+    // الحصول على معرف المستخدم (يمكن تحسينه لاحقاً)
+    function getUserId() {
+      const student = localStorage.getItem('currentStudent');
+      if (student) {
+        const studentData = JSON.parse(student);
+        return studentData.code || 'guest';
+      }
+      return null;
+    }
+
+    // تنسيق التاريخ
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    // تسجيل الدخول (من index.html الموجود)
+    async function handleLogin() {
       const code = document.getElementById("studentCode").value.trim();
-      const loadingDiv = document.getElementById("loading");
-      const loginBtn = document.getElementById("loginBtn");
+      const messageDiv = document.getElementById("message");
 
       if (!code || code.length !== 6 || !/^\d+$/.test(code)) {
         showMessage("⚠️ الرجاء إدخال كود صحيح مكون من 6 أرقام", "error");
@@ -170,10 +781,7 @@
       }
 
       try {
-        loadingDiv.style.display = "block";
-        loginBtn.disabled = true;
-
-        const response = await fetch(API_URL, {
+        const response = await fetch(`${API_URL}/students/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code })
@@ -185,24 +793,36 @@
         }
 
         const student = await response.json();
-        // ✅ تخزين بيانات الطالب مؤقتًا
         localStorage.setItem("currentStudent", JSON.stringify(student));
         showMessage("✅ تم تسجيل الدخول بنجاح", "success");
 
         setTimeout(() => {
-          window.location.href = "student";
+          window.location.href = "/student";
         }, 1000);
       } catch (err) {
         showMessage("⚠️ حدث خطأ أثناء تسجيل الدخول", "error");
-      } finally {
-        loadingDiv.style.display = "none";
-        loginBtn.disabled = false;
       }
-    });
+    }
 
-    document.getElementById("studentCode").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        document.getElementById("loginBtn").click();
+    // عرض الرسائل
+    function showMessage(text, type) {
+      const messageDiv = document.getElementById("message");
+      messageDiv.textContent = text;
+      messageDiv.className = "message";
+      messageDiv.style.display = "block";
+      messageDiv.style.backgroundColor = type === 'error' ? '#ffebee' : '#e8f5e9';
+      messageDiv.style.color = type === 'error' ? '#c62828' : '#2e7d32';
+      messageDiv.style.borderLeft = type === 'error' ? '4px solid #c62828' : '4px solid #2e7d32';
+
+      setTimeout(() => {
+        messageDiv.style.display = "none";
+      }, 4000);
+    }
+
+    // إغلاق المودال عند النقر خارج الصورة
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeImageModal();
       }
     });
   </script>
