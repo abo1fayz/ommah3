@@ -578,6 +578,177 @@
             font-size: 0.95rem;
         }
 
+        /* Gallery Styles */
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+            padding: 10px 0;
+        }
+
+        .gallery-thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .gallery-thumbnail:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+
+        .gallery-thumbnail.more-images {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .gallery-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1200;
+            padding: 20px;
+        }
+
+        .gallery-content {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+        }
+
+        .gallery-main-image {
+            width: 100%;
+            height: 60vh;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .gallery-thumbnails {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            justify-content: center;
+        }
+
+        .gallery-thumbnail-small {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: var(--transition);
+        }
+
+        .gallery-thumbnail-small.active {
+            opacity: 1;
+            border: 2px solid var(--secondary);
+        }
+
+        .gallery-thumbnail-small:hover {
+            opacity: 1;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: var(--white);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .gallery-nav:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .gallery-prev {
+            right: 20px;
+        }
+
+        .gallery-next {
+            left: 20px;
+        }
+
+        .gallery-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.5);
+            color: var(--white);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .gallery-close:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .gallery-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Tags */
+        .achievement-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .achievement-tag {
+            background: rgba(44, 120, 108, 0.1);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
         /* Navigation Bar */
         .mobile-nav {
             position: fixed;
@@ -778,12 +949,16 @@
             padding: 20px;
         }
 
+        .modal-gallery {
+            margin-bottom: 20px;
+        }
+
         .modal-image {
             width: 100%;
             height: 250px;
             object-fit: cover;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .modal-description {
@@ -899,6 +1074,15 @@
                 max-width: 500px;
                 left: 50%;
                 transform: translateX(-50%);
+            }
+            
+            .gallery-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .gallery-thumbnail {
+                width: 100px;
+                height: 100px;
             }
         }
     </style>
@@ -1174,8 +1358,7 @@
                         </div>
                         <div class="contact-details">
                             <h4>البريد الإلكتروني</h4>
-<p>bdalqadrahmdhythm@gmail.com+</p>
-                            
+                            <p>bdalqadrahmdhythm@gmail.com</p>
                         </div>
                     </div>
                     
@@ -1184,11 +1367,9 @@
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="contact-details">
-<h4>ايام الدوام</h4>
-<p>من الاحد حتى الخميس</p>
-                            
+                            <h4>أيام الدوام</h4>
+                            <p>من الأحد حتى الخميس</p>
                         </div>
-
                     </div>
                 </div>
                 
@@ -1258,6 +1439,19 @@
         <i class="fas fa-arrow-up"></i>
     </div>
 
+    <!-- Gallery Modal -->
+    <div class="gallery-modal" id="galleryModal">
+        <button class="gallery-close" onclick="closeGallery()">&times;</button>
+        <button class="gallery-nav gallery-prev" onclick="prevImage()">&lt;</button>
+        <button class="gallery-nav gallery-next" onclick="nextImage()">&gt;</button>
+        
+        <div class="gallery-content">
+            <img id="galleryMainImage" class="gallery-main-image" src="" alt="">
+            <div id="galleryCounter" class="gallery-counter">1 / 1</div>
+            <div id="galleryThumbnails" class="gallery-thumbnails"></div>
+        </div>
+    </div>
+
     <!-- Achievement Detail Modal -->
     <div class="modal-overlay" id="achievementModal">
         <div class="modal-content">
@@ -1266,7 +1460,10 @@
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <img id="modalAchievementImage" src="" alt="" class="modal-image">
+                <div class="modal-gallery" id="modalGallery"></div>
+                
+                <div class="achievement-tags" id="modalTags"></div>
+                
                 <p class="modal-description" id="modalAchievementDescription"></p>
                 
                 <div class="modal-stats">
@@ -1279,6 +1476,11 @@
                         <i class="fas fa-comment"></i>
                         <span id="modalCommentsCount">0</span>
                         <small>تعليق</small>
+                    </div>
+                    <div class="modal-stat">
+                        <i class="fas fa-images"></i>
+                        <span id="modalImagesCount">0</span>
+                        <small>صورة</small>
                     </div>
                     <div class="modal-stat">
                         <i class="fas fa-calendar"></i>
@@ -1307,6 +1509,8 @@
         let achievementsCache = null;
         let competitionsCache = null;
         let currentAchievementId = null;
+        let currentGalleryImages = [];
+        let currentImageIndex = 0;
 
         // تهيئة التطبيق
         document.addEventListener('DOMContentLoaded', function() {
@@ -1342,11 +1546,16 @@
                     closeModal();
                 }
             });
+            
+            document.getElementById('galleryModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeGallery();
+                }
+            });
         }
 
         // إعداد التنقل
         function setupNavigation() {
-            // تحديث حالة الروابط النشطة
             updateActiveNav();
         }
 
@@ -1395,7 +1604,6 @@
                     window.location.href = '/student';
                 };
                 
-                // إظهار اسم الطالب في الهيدر
                 const instituteName = document.querySelector('.institute-name');
                 if (instituteName) {
                     const welcomeText = document.createElement('p');
@@ -1460,37 +1668,20 @@
             const fullList = document.getElementById('fullAchievementsList');
 
             try {
-                if (!achievementsCache) {
-                    const response = await fetch(`${API_URL}/achievements?limit=10`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch achievements');
-                    }
-                    achievementsCache = await response.json();
+                const response = await fetch(`${API_URL}/achievements`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch achievements');
                 }
+                const achievements = await response.json();
+                
+                // ترتيب الإنجازات من الأحدث إلى الأقدم
+                achievements.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+                achievementsCache = achievements;
 
                 // عرض أحدث 3 إنجازات في الكاروسيل
-                const latestAchievements = achievementsCache.slice(0, 3);
+                const latestAchievements = achievements.slice(0, 3);
                 if (latestAchievements.length > 0) {
-                    carousel.innerHTML = latestAchievements.map(achievement => `
-                        <div class="achievement-card" onclick="showAchievementDetail('${achievement._id}')">
-                            ${achievement.images && achievement.images.length > 0 ? `
-                                <img src="${achievement.images[0].url}" alt="${achievement.title}" class="achievement-image">
-                            ` : `
-                                <div class="achievement-image" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-trophy" style="color: white; font-size: 3rem;"></i>
-                                </div>
-                            `}
-                            <div class="achievement-content">
-                                <h4 class="achievement-title">${achievement.title}</h4>
-                                <p class="achievement-desc">${achievement.description.substring(0, 100)}...</p>
-                                <div class="achievement-stats">
-                                    <span><i class="fas fa-heart"></i> ${achievement.likes || 0}</span>
-                                    <span><i class="fas fa-comment"></i> ${achievement.comments ? achievement.comments.length : 0}</span>
-                                    <span>${formatDate(achievement.date)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
+                    carousel.innerHTML = latestAchievements.map(achievement => renderAchievementCard(achievement, true)).join('');
                 } else {
                     carousel.innerHTML = `
                         <div class="achievement-card" style="text-align: center; padding: 40px 20px;">
@@ -1501,28 +1692,8 @@
                 }
 
                 // عرض جميع الإنجازات في القسم الكامل
-                if (achievementsCache.length > 0) {
-                    fullList.innerHTML = achievementsCache.map(achievement => `
-                        <div class="achievement-card" onclick="showAchievementDetail('${achievement._id}')">
-                            ${achievement.images && achievement.images.length > 0 ? `
-                                <img src="${achievement.images[0].url}" alt="${achievement.title}" class="achievement-image">
-                            ` : `
-                                <div class="achievement-image" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center;">
-                                    <i class="fas fa-trophy" style="color: white; font-size: 3rem;"></i>
-                                </div>
-                            `}
-                            <div class="achievement-content">
-                                <h4 class="achievement-title">${achievement.title}</h4>
-                                <p class="achievement-desc">${achievement.description}</p>
-                                <div class="achievement-stats">
-                                    <span><i class="fas fa-heart"></i> ${achievement.likes || 0}</span>
-                                    <span><i class="fas fa-comment"></i> ${achievement.comments ? achievement.comments.length : 0}</span>
-                                    <span><i class="fas fa-images"></i> ${achievement.images ? achievement.images.length : 0}</span>
-                                    <span>${formatDate(achievement.date)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
+                if (achievements.length > 0) {
+                    fullList.innerHTML = achievements.map(achievement => renderAchievementCard(achievement, false)).join('');
                 } else {
                     fullList.innerHTML = `
                         <div class="achievement-card" style="text-align: center; padding: 40px 20px;">
@@ -1552,19 +1723,65 @@
             }
         }
 
+        // دالة لرسم بطاقة الإنجاز
+        function renderAchievementCard(achievement, isCarousel) {
+            const hasImages = achievement.images && achievement.images.length > 0;
+            const firstImage = hasImages ? achievement.images[0].url : null;
+            const imageCount = hasImages ? achievement.images.length : 0;
+            const shortDesc = isCarousel ? 
+                (achievement.description.length > 100 ? achievement.description.substring(0, 100) + '...' : achievement.description) :
+                achievement.description;
+            
+            return `
+                <div class="achievement-card" onclick="showAchievementDetail('${achievement._id}')">
+                    ${hasImages ? `
+                        <div style="position: relative;">
+                            <img src="${firstImage}" alt="${achievement.title}" class="achievement-image">
+                            ${imageCount > 1 ? `
+                                <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">
+                                    <i class="fas fa-images"></i> ${imageCount}
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : `
+                        <div class="achievement-image" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-trophy" style="color: white; font-size: 3rem;"></i>
+                        </div>
+                    `}
+                    <div class="achievement-content">
+                        <h4 class="achievement-title">${achievement.title}</h4>
+                        <p class="achievement-desc">${shortDesc}</p>
+                        
+                        ${achievement.tags && achievement.tags.length > 0 ? `
+                            <div class="achievement-tags">
+                                ${achievement.tags.slice(0, 3).map(tag => `
+                                    <span class="achievement-tag">${tag}</span>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="achievement-stats">
+                            <span><i class="fas fa-heart"></i> ${achievement.likes || 0}</span>
+                            <span><i class="fas fa-comment"></i> ${achievement.comments ? achievement.comments.length : 0}</span>
+                            <span><i class="fas fa-images"></i> ${imageCount}</span>
+                            <span>${formatDate(achievement.date)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         // تحميل المسابقات
         async function loadCompetitions() {
             const list = document.getElementById('competitionsList');
             const fullList = document.getElementById('fullCompetitionsList');
 
             try {
-                if (!competitionsCache) {
-                    const response = await fetch(`${API_URL}/competitions?limit=5`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch competitions');
-                    }
-                    competitionsCache = await response.json();
+                const response = await fetch(`${API_URL}/competitions`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch competitions');
                 }
+                competitionsCache = await response.json();
 
                 // عرض آخر مسابقتين في الصفحة الرئيسية
                 const latestCompetitions = competitionsCache.slice(0, 2);
@@ -1641,23 +1858,15 @@
 
         // إظهار قسم معين
         function showSection(sectionId) {
-            // إخفاء جميع الأقسام
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
 
-            // إظهار القسم المطلوب
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
                 targetSection.classList.add('active');
-                
-                // تحديث الروابط في الـ navigation
                 updateActiveNav();
-
-                // التمرير إلى الأعلى
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                
-                // تحديث العنوان في المتصفح
                 window.history.pushState(null, null, `#${sectionId}`);
             }
         }
@@ -1685,10 +1894,9 @@
                 contactBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
                 contactBtn.disabled = true;
 
-                // محاكاة الإرسال (في الإصدار الحقيقي، سيتم إرسالها للخادم)
+                // محاكاة الإرسال
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
-                // تخزين الرسالة محلياً للعرض التوضيحي
                 const contactMessage = {
                     name,
                     email,
@@ -1700,10 +1908,8 @@
                 messages.push(contactMessage);
                 localStorage.setItem('contactMessages', JSON.stringify(messages));
 
-                // إظهار رسالة النجاح
                 showMessage(statusDiv, '✅ تم إرسال رسالتك بنجاح، سنتواصل معك قريباً', 'success');
                 
-                // مسح الحقول
                 document.getElementById('contactName').value = '';
                 document.getElementById('contactEmail').value = '';
                 document.getElementById('contactMessage').value = '';
@@ -1734,13 +1940,40 @@
                 document.getElementById('modalAchievementDescription').textContent = achievement.description;
                 document.getElementById('modalLikesCount').textContent = achievement.likes || 0;
                 document.getElementById('modalCommentsCount').textContent = achievement.comments ? achievement.comments.length : 0;
+                document.getElementById('modalImagesCount').textContent = achievement.images ? achievement.images.length : 0;
                 document.getElementById('modalDate').textContent = formatDate(achievement.date);
                 
+                // عرض معرض الصور
+                const galleryContainer = document.getElementById('modalGallery');
                 if (achievement.images && achievement.images.length > 0) {
-                    document.getElementById('modalAchievementImage').src = achievement.images[0].url;
-                    document.getElementById('modalAchievementImage').style.display = 'block';
+                    galleryContainer.innerHTML = `
+                        <div class="gallery-container">
+                            ${achievement.images.map((image, index) => `
+                                <img src="${image.url}" 
+                                     alt="${achievement.title} - صورة ${index + 1}" 
+                                     class="gallery-thumbnail"
+                                     onclick="openGallery('${achievement._id}', ${index})">
+                            `).join('')}
+                        </div>
+                    `;
                 } else {
-                    document.getElementById('modalAchievementImage').style.display = 'none';
+                    galleryContainer.innerHTML = `
+                        <div class="gallery-container">
+                            <div class="gallery-thumbnail more-images" style="display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // عرض الكلمات الدلالية
+                const tagsContainer = document.getElementById('modalTags');
+                if (achievement.tags && achievement.tags.length > 0) {
+                    tagsContainer.innerHTML = achievement.tags.map(tag => `
+                        <span class="achievement-tag">${tag}</span>
+                    `).join('');
+                } else {
+                    tagsContainer.innerHTML = '';
                 }
                 
                 // عرض التعليقات
@@ -1764,6 +1997,71 @@
                 console.error('Error showing achievement detail:', error);
                 alert('حدث خطأ في تحميل تفاصيل الإنجاز');
             }
+        }
+
+        // فتح معرض الصور
+        function openGallery(achievementId, startIndex = 0) {
+            const achievement = achievementsCache.find(a => a._id === achievementId);
+            if (!achievement || !achievement.images || achievement.images.length === 0) {
+                return;
+            }
+            
+            currentGalleryImages = achievement.images;
+            currentImageIndex = startIndex;
+            
+            updateGallery();
+            document.getElementById('galleryModal').style.display = 'flex';
+        }
+
+        // تحديث معرض الصور
+        function updateGallery() {
+            const mainImage = document.getElementById('galleryMainImage');
+            const thumbnailsContainer = document.getElementById('galleryThumbnails');
+            const counter = document.getElementById('galleryCounter');
+            
+            if (currentGalleryImages.length === 0) return;
+            
+            // تحديث الصورة الرئيسية
+            mainImage.src = currentGalleryImages[currentImageIndex].url;
+            mainImage.alt = `صورة ${currentImageIndex + 1} من ${currentGalleryImages.length}`;
+            
+            // تحديث العداد
+            counter.textContent = `${currentImageIndex + 1} / ${currentGalleryImages.length}`;
+            
+            // تحديث الصور المصغرة
+            thumbnailsContainer.innerHTML = currentGalleryImages.map((image, index) => `
+                <img src="${image.url}" 
+                     alt="صورة ${index + 1}"
+                     class="gallery-thumbnail-small ${index === currentImageIndex ? 'active' : ''}"
+                     onclick="goToImage(${index})">
+            `).join('');
+        }
+
+        // الانتقال إلى صورة محددة
+        function goToImage(index) {
+            if (index >= 0 && index < currentGalleryImages.length) {
+                currentImageIndex = index;
+                updateGallery();
+            }
+        }
+
+        // الصورة السابقة
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + currentGalleryImages.length) % currentGalleryImages.length;
+            updateGallery();
+        }
+
+        // الصورة التالية
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % currentGalleryImages.length;
+            updateGallery();
+        }
+
+        // إغلاق معرض الصور
+        function closeGallery() {
+            document.getElementById('galleryModal').style.display = 'none';
+            currentGalleryImages = [];
+            currentImageIndex = 0;
         }
 
         // إضافة تعليق
@@ -1902,7 +2200,6 @@
         // إعادة تحميل البيانات عند العودة للصفحة
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
-                // الصفحة أصبحت مرئية
                 checkLoginStatus();
             }
         });
