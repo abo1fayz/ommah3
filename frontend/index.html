@@ -44,27 +44,41 @@
             padding-bottom: 70px;
         }
 
-        /* Announcement Banner - FIXED */
+        /* Floating Announcement Banner - NEW DESIGN */
         .announcement-banner {
             position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
+            bottom: 80px;
+            right: 20px;
+            left: 20px;
             background: linear-gradient(135deg, #4CAF50, #2E7D32);
             color: var(--white);
-            padding: 10px 15px;
+            padding: 12px 16px;
             z-index: 1001;
             display: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-radius: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+            animation: slideUpFade 0.5s ease-out;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .announcement-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 10px;
+            gap: 12px;
         }
 
         .announcement-text {
@@ -73,22 +87,29 @@
             align-items: center;
             gap: 10px;
             font-size: 0.85rem;
+            font-weight: 600;
         }
 
         .announcement-icon {
             font-size: 1rem;
             animation: pulse 2s infinite;
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 50%;
         }
 
         @keyframes pulse {
             0% {
                 transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255,255,255,0.4);
             }
-            50% {
-                transform: scale(1.1);
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(255,255,255,0);
             }
             100% {
                 transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255,255,255,0);
             }
         }
 
@@ -96,30 +117,32 @@
             color: var(--white);
             text-decoration: none;
             font-weight: 600;
-            padding: 6px 12px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.25);
+            border-radius: 12px;
             transition: var(--transition);
             display: flex;
             align-items: center;
-            gap: 5px;
-            font-size: 0.8rem;
-            margin: 0 8px;
+            gap: 6px;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.3);
         }
 
         .announcement-link:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.35);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         .close-announcement {
-            background: none;
+            background: rgba(255,255,255,0.2);
             border: none;
             color: var(--white);
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            width: 25px;
-            height: 25px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -129,16 +152,17 @@
         }
 
         .close-announcement:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
         }
 
-        /* Header - FIXED POSITIONING */
+        /* Header - FIXED POSITION */
         .app-header {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: var(--white);
             padding: 15px 20px;
             position: fixed;
-            top: 40px; /* Adjusted for announcement banner */
+            top: 0;
             right: 0;
             left: 0;
             z-index: 1000;
@@ -198,7 +222,7 @@
 
         /* Main Content */
         .main-content {
-            margin-top: 100px; /* Adjusted for header + announcement */
+            margin-top: 60px;
             padding: 0 0 80px 0;
             transition: var(--transition);
         }
@@ -1250,12 +1274,14 @@
         @media (min-width: 768px) {
             .main-content {
                 max-width: 500px;
-                margin: 100px auto 0;
+                margin: 60px auto 0;
                 padding-bottom: 80px;
             }
             
-            .announcement-content {
-                padding: 0 20px;
+            .announcement-banner {
+                right: 50%;
+                transform: translateX(50%);
+                max-width: 400px;
             }
             
             .features-grid {
@@ -1281,30 +1307,43 @@
                 height: 100px;
             }
         }
+
+        @media (max-width: 767px) {
+            .announcement-banner {
+                bottom: 70px;
+                margin: 0 10px;
+            }
+            
+            .scroll-top {
+                bottom: 130px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .announcement-content {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .announcement-text {
+                font-size: 0.8rem;
+            }
+            
+            .announcement-link {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .close-announcement {
+                position: absolute;
+                top: 8px;
+                left: 8px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Announcement Banner - FIXED POSITIONING -->
-    <div class="announcement-banner" id="announcementBanner">
-        <div class="announcement-content">
-            <div class="announcement-text">
-                <i class="fas fa-mobile-alt announcement-icon"></i>
-                <span>حمل تطبيق القرآن حياة لمساعدتك على قراءة القرآن</span>
-            </div>
-            <a href="https://app3556480-zxv.en.uptodown.com/android" 
-               target="_blank" 
-               class="announcement-link"
-               onclick="openExternalApp()">
-                <i class="fas fa-download"></i>
-                حمل الآن
-            </a>
-            <button class="close-announcement" onclick="closeAnnouncement()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
-
-    <!-- Header - FIXED POSITIONING -->
+    <!-- Header - Fixed Position -->
     <header class="app-header" id="mainHeader">
         <div class="header-content">
             <div class="logo">
@@ -1658,6 +1697,26 @@
         </section>
     </main>
 
+    <!-- Announcement Banner - FLOATING POSITION (New Design) -->
+    <div class="announcement-banner" id="announcementBanner">
+        <div class="announcement-content">
+            <div class="announcement-text">
+                <i class="fas fa-mobile-alt announcement-icon"></i>
+                <span>حمل تطبيق القرآن حياة لمساعدتك على قراءة القرآن</span>
+            </div>
+            <a href="https://app3556480-zxv.en.uptodown.com/android" 
+               target="_blank" 
+               class="announcement-link"
+               onclick="openExternalApp()">
+                <i class="fas fa-download"></i>
+                حمل الآن
+            </a>
+            <button class="close-announcement" onclick="closeAnnouncement()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Mobile Navigation -->
     <nav class="mobile-nav">
         <a href="javascript:void(0)" class="nav-item active" onclick="showSection('home')">
@@ -1771,9 +1830,7 @@
             loadCompetitions();
             checkLoginStatus();
             setupNavigation();
-            showAnnouncement();
-            
-            // إظهار الصفحة الرئيسية افتراضياً
+            setupAnnouncement();
             showSection('home');
         });
 
@@ -1834,6 +1891,20 @@
                     });
                 }
             });
+        }
+
+        // إعداد الإعلان
+        function setupAnnouncement() {
+            const announcementHidden = localStorage.getItem('announcementHidden');
+            const hideUntil = localStorage.getItem('announcementHideUntil');
+            
+            if (!announcementHidden && (!hideUntil || new Date() > new Date(hideUntil))) {
+                // إظهار الإعلان بعد تأخير 3 ثواني
+                setTimeout(() => {
+                    const banner = document.getElementById('announcementBanner');
+                    banner.style.display = 'block';
+                }, 3000);
+            }
         }
 
         // التحقق من حالة تسجيل الدخول
@@ -1969,45 +2040,21 @@
             }
         }
 
-        // إظهار الإعلان
-        function showAnnouncement() {
-            const announcementHidden = localStorage.getItem('announcementHidden');
-            const hideUntil = localStorage.getItem('announcementHideUntil');
-            
-            if (!announcementHidden) {
-                // إذا لم يتم إخفاء الإعلان نهائياً
-                if (!hideUntil || new Date() > new Date(hideUntil)) {
-                    const banner = document.getElementById('announcementBanner');
-                    banner.style.display = 'block';
-                    
-                    // ضبط الهيدر ليكون تحت الإعلان
-                    const header = document.getElementById('mainHeader');
-                    header.style.top = '40px'; // ارتفاع الإعلان
-                    
-                    // ضبط المحتوى الرئيسي
-                    const mainContent = document.querySelector('.main-content');
-                    mainContent.style.marginTop = '100px'; // header (60px) + announcement (40px)
-                }
-            }
-        }
-
         // إغلاق الإعلان
         function closeAnnouncement() {
             const banner = document.getElementById('announcementBanner');
             banner.style.display = 'none';
             
-            // إعادة الهيدر إلى مكانه الأصلي
-            const header = document.getElementById('mainHeader');
-            header.style.top = '0';
-            
-            // إعادة المحتوى الرئيسي
-            const mainContent = document.querySelector('.main-content');
-            mainContent.style.marginTop = '60px'; // header فقط
-            
             // حفظ حالة الإخفاء ليوم واحد
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             localStorage.setItem('announcementHideUntil', tomorrow.toISOString());
+            
+            // إخفاء الإعلان نهائياً عند النقر على زر التحميل
+            const hidePermanently = confirm('هل تريد إخفاء هذا الإعلان نهائياً؟');
+            if (hidePermanently) {
+                localStorage.setItem('announcementHidden', 'true');
+            }
         }
 
         // فتح التطبيق الخارجي
