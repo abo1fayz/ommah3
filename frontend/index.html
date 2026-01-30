@@ -44,6 +44,117 @@
             padding-bottom: 70px;
         }
 
+        /* Announcement Banner */
+        .announcement-banner {
+            position: fixed;
+            top: 60px;
+            right: 0;
+            left: 0;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: var(--white);
+            padding: 12px 15px;
+            z-index: 999;
+            display: none;
+            animation: slideDown 0.5s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        .announcement-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        .announcement-text {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .announcement-icon {
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .announcement-link {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            margin: 0 10px;
+        }
+
+        .announcement-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .close-announcement {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .close-announcement:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
         /* Header */
         .app-header {
             background: linear-gradient(135deg, var(--primary), var(--accent));
@@ -59,6 +170,10 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+
+        .announcement-show .app-header {
+            top: 50px;
         }
 
         .header-content {
@@ -99,10 +214,21 @@
             margin: 0;
         }
 
+        .welcome-text {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
         /* Main Content */
         .main-content {
             margin-top: 60px;
             padding: 0 0 80px 0;
+            transition: var(--transition);
+        }
+
+        .announcement-show .main-content {
+            margin-top: 110px;
         }
 
         /* Sections */
@@ -249,6 +375,69 @@
         .login-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(44, 120, 108, 0.3);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.3);
+        }
+
+        .student-info {
+            background: #e8f5e9;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-right: 4px solid var(--success);
+        }
+
+        .student-info h4 {
+            color: var(--success);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .student-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .student-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .student-detail .label {
+            color: #666;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        .student-detail .value {
+            color: var(--primary-dark);
+            font-weight: 600;
         }
 
         /* Features Grid */
@@ -1062,6 +1251,15 @@
                 padding-bottom: 80px;
             }
             
+            .announcement-show .main-content {
+                margin-top: 110px;
+                max-width: 500px;
+            }
+            
+            .announcement-content {
+                padding: 0 20px;
+            }
+            
             .features-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
@@ -1088,6 +1286,26 @@
     </style>
 </head>
 <body>
+    <!-- Announcement Banner -->
+    <div class="announcement-banner" id="announcementBanner">
+        <div class="announcement-content">
+            <div class="announcement-text">
+                <i class="fas fa-mobile-alt announcement-icon"></i>
+                <span>حمل تطبيق القرآن حياة لمساعدتك على قراءة القرآن</span>
+            </div>
+            <a href="https://app3556480-zxv.en.uptodown.com/android" 
+               target="_blank" 
+               class="announcement-link"
+               onclick="openExternalApp()">
+                <i class="fas fa-download"></i>
+                حمل الآن
+            </a>
+            <button class="close-announcement" onclick="closeAnnouncement()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="app-header">
         <div class="header-content">
@@ -1097,6 +1315,7 @@
             <div class="institute-name">
                 <h1>معهد جيل الأمة</h1>
                 <p>نور العلم والإيمان</p>
+                <p id="welcomeText" class="welcome-text" style="display: none;"></p>
             </div>
         </div>
     </header>
@@ -1117,20 +1336,49 @@
             <div class="login-card">
                 <h3 class="login-title">
                     <i class="fas fa-user-graduate"></i>
-                    تسجيل دخول الطالب
+                    <span id="loginTitle">تسجيل دخول الطالب</span>
                 </h3>
                 
-                <div class="form-group">
-                    <label for="studentCode" class="form-label">كود الدخول</label>
-                    <input type="text" id="studentCode" class="form-input" 
-                           placeholder="أدخل الكود المكون من 6 أرقام" 
-                           maxlength="6" 
-                           inputmode="numeric">
+                <div id="studentInfo" class="student-info" style="display: none;">
+                    <h4><i class="fas fa-user-circle"></i> معلومات الطالب</h4>
+                    <div class="student-details">
+                        <div class="student-detail">
+                            <span class="label">الاسم</span>
+                            <span id="studentNameDisplay" class="value"></span>
+                        </div>
+                        <div class="student-detail">
+                            <span class="label">الكود</span>
+                            <span id="studentCodeDisplay" class="value"></span>
+                        </div>
+                        <div class="student-detail">
+                            <span class="label">المستوى</span>
+                            <span id="studentLevelDisplay" class="value"></span>
+                        </div>
+                        <div class="student-detail">
+                            <span class="label">آخر دخول</span>
+                            <span id="lastLoginDisplay" class="value"></span>
+                        </div>
+                    </div>
                 </div>
                 
-                <button id="loginBtn" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    دخول
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label for="studentCode" class="form-label">كود الدخول</label>
+                        <input type="text" id="studentCode" class="form-input" 
+                               placeholder="أدخل الكود المكون من 6 أرقام" 
+                               maxlength="6" 
+                               inputmode="numeric">
+                    </div>
+                    
+                    <button id="loginBtn" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        دخول
+                    </button>
+                </div>
+                
+                <button id="logoutBtn" class="logout-btn" style="display: none;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    تسجيل الخروج
                 </button>
                 
                 <div id="loginMessage" class="message"></div>
@@ -1288,7 +1536,7 @@
                         
                         <div class="about-feature">
                             <i class="fas fa-calendar-alt"></i>
-                            <h4>برامج  منتظمة</h4>
+                            <h4>برامج منتظمة</h4>
                             <p>برامج دراسية منتظمة</p>
                         </div>
                         
@@ -1338,7 +1586,7 @@
                         </div>
                         <div class="contact-details">
                             <h4>العنوان</h4>
-                            <p>  مارع وسط الشارع العريض</p>
+                            <p>مارع وسط الشارع العريض</p>
                         </div>
                     </div>
                     
@@ -1519,6 +1767,7 @@
             loadCompetitions();
             checkLoginStatus();
             setupNavigation();
+            showAnnouncement();
             
             // إظهار الصفحة الرئيسية افتراضياً
             showSection('home');
@@ -1533,6 +1782,9 @@
                     handleLogin();
                 }
             });
+
+            // تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
             // إرسال رسالة اتصل بنا
             document.getElementById('sendMessageBtn').addEventListener('click', sendContactMessage);
@@ -1594,24 +1846,57 @@
         // تحديث واجهة المستخدم للمستخدم المسجل
         function updateUIForLoggedInUser() {
             if (currentStudent) {
-                const loginBtn = document.getElementById('loginBtn');
+                // تحديث عنوان البطاقة
+                document.getElementById('loginTitle').textContent = 'مرحباً بك';
+                
+                // إخفاء حقل الإدخال وإظهار معلومات الطالب
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('studentInfo').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'block';
+                
+                // تعبئة معلومات الطالب
+                document.getElementById('studentNameDisplay').textContent = currentStudent.name || 'غير معروف';
+                document.getElementById('studentCodeDisplay').textContent = currentStudent.code || 'غير معروف';
+                document.getElementById('studentLevelDisplay').textContent = currentStudent.overallLevel || 'غير محدد';
+                
+                // تحديث تاريخ آخر دخول
+                const now = new Date();
+                const lastLogin = currentStudent.lastLogin ? new Date(currentStudent.lastLogin) : now;
+                const timeDiff = Math.abs(now - lastLogin);
+                const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                
+                let lastLoginText = 'اليوم';
+                if (daysDiff === 1) {
+                    lastLoginText = 'أمس';
+                } else if (daysDiff > 1 && daysDiff < 7) {
+                    lastLoginText = `منذ ${daysDiff} أيام`;
+                } else if (daysDiff >= 7) {
+                    const weeksDiff = Math.floor(daysDiff / 7);
+                    lastLoginText = `منذ ${weeksDiff} أسبوع${weeksDiff > 1 ? 'ين' : ''}`;
+                }
+                
+                document.getElementById('lastLoginDisplay').textContent = lastLoginText;
+                
+                // إظهار رسالة الترحيب في الهيدر
+                const welcomeText = document.getElementById('welcomeText');
                 const studentName = currentStudent.name ? currentStudent.name.split(' ')[0] : 'طالب';
-                loginBtn.innerHTML = `
-                    <i class="fas fa-user"></i>
-                    مرحباً ${studentName}
-                `;
+                welcomeText.textContent = `مرحباً ${studentName}`;
+                welcomeText.style.display = 'block';
+                
+                // تغيير وظيفة زر الدخول
+                const loginBtn = document.getElementById('loginBtn');
+                loginBtn.innerHTML = '<i class="fas fa-user"></i> الذهاب للصفحة الشخصية';
                 loginBtn.onclick = function() {
                     window.location.href = '/student';
                 };
+                loginBtn.classList.remove('login-btn');
+                loginBtn.classList.add('logout-btn');
+                loginBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--accent))';
                 
-                const instituteName = document.querySelector('.institute-name');
-                if (instituteName) {
-                    const welcomeText = document.createElement('p');
-                    welcomeText.className = 'welcome-text';
-                    welcomeText.style.fontSize = '0.8rem';
-                    welcomeText.style.opacity = '0.9';
-                    welcomeText.textContent = `مرحباً ${studentName}`;
-                    instituteName.appendChild(welcomeText);
+                // حفظ وقت آخر دخول
+                if (!currentStudent.lastLogin) {
+                    currentStudent.lastLogin = new Date().toISOString();
+                    localStorage.setItem('currentStudent', JSON.stringify(currentStudent));
                 }
             }
         }
@@ -1643,6 +1928,7 @@
                 }
 
                 const student = await response.json();
+                student.lastLogin = new Date().toISOString(); // إضافة وقت الدخول
                 currentStudent = student;
                 localStorage.setItem('currentStudent', JSON.stringify(student));
                 
@@ -1660,6 +1946,83 @@
                 loadingDiv.style.display = 'none';
                 document.getElementById('loginBtn').disabled = false;
             }
+        }
+
+        // تسجيل الخروج
+        function handleLogout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                localStorage.removeItem('currentStudent');
+                currentStudent = null;
+                
+                // إعادة تعيين واجهة المستخدم
+                document.getElementById('loginTitle').textContent = 'تسجيل دخول الطالب';
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('studentInfo').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('studentCode').value = '';
+                
+                // إخفاء رسالة الترحيب في الهيدر
+                const welcomeText = document.getElementById('welcomeText');
+                welcomeText.style.display = 'none';
+                
+                // إعادة تعيين زر الدخول
+                const loginBtn = document.getElementById('loginBtn');
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
+                loginBtn.onclick = handleLogin;
+                loginBtn.classList.add('login-btn');
+                loginBtn.classList.remove('logout-btn');
+                
+                showMessage(document.getElementById('loginMessage'), '✅ تم تسجيل الخروج بنجاح', 'success');
+            }
+        }
+
+        // إظهار الإعلان
+        function showAnnouncement() {
+            const announcementHidden = localStorage.getItem('announcementHidden');
+            const hideUntil = localStorage.getItem('announcementHideUntil');
+            
+            if (!announcementHidden) {
+                // إذا لم يتم إخفاء الإعلان نهائياً
+                if (!hideUntil || new Date() > new Date(hideUntil)) {
+                    const banner = document.getElementById('announcementBanner');
+                    banner.style.display = 'block';
+                    document.body.classList.add('announcement-show');
+                    
+                    // إضافة تأثير الظهور
+                    setTimeout(() => {
+                        banner.style.animation = 'slideDown 0.5s ease';
+                    }, 100);
+                }
+            }
+        }
+
+        // إغلاق الإعلان
+        function closeAnnouncement() {
+            const banner = document.getElementById('announcementBanner');
+            banner.style.animation = 'slideUp 0.5s ease';
+            
+            setTimeout(() => {
+                banner.style.display = 'none';
+                document.body.classList.remove('announcement-show');
+                
+                // حفظ حالة الإخفاء ليوم واحد
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                localStorage.setItem('announcementHideUntil', tomorrow.toISOString());
+            }, 500);
+        }
+
+        // فتح التطبيق الخارجي
+        function openExternalApp() {
+            const appUrl = 'https://app3556480-zxv.en.uptodown.com/android';
+            
+            // محاولة فتح في نافذة جديدة
+            window.open(appUrl, '_blank', 'noopener,noreferrer');
+            
+            // إخفاء الإعلان بعد النقر عليه
+            closeAnnouncement();
+            
+            return false;
         }
 
         // تحميل الإنجازات
