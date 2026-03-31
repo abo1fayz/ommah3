@@ -1,57 +1,47 @@
-const { db } = require('../config/firebase-admin');
+// models/StudentFirebase.js
+const { db } = require('../config/firebase');
 
 const COLLECTION = 'students';
 
 class StudentModel {
-  // جلب جميع الطلاب
   static async findAll() {
+    if (!db) return [];
     try {
-      const snapshot = await db.collection(COLLECTION)
-        .orderBy('createdAt', 'desc')
-        .get();
-      
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const snapshot = await db.collection(COLLECTION).orderBy('createdAt', 'desc').get();
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
-      console.error('Error finding all students:', error);
-      throw error;
+      console.error('Error finding students:', error);
+      return [];
     }
   }
 
-  // جلب طالب بالكود
   static async findByCode(code) {
+    if (!db) return null;
     try {
-      const snapshot = await db.collection(COLLECTION)
-        .where('code', '==', code)
-        .limit(1)
-        .get();
-      
+      const snapshot = await db.collection(COLLECTION).where('code', '==', code).limit(1).get();
       if (snapshot.empty) return null;
-      
       const doc = snapshot.docs[0];
       return { id: doc.id, ...doc.data() };
     } catch (error) {
       console.error('Error finding student by code:', error);
-      throw error;
+      return null;
     }
   }
 
-  // جلب طالب بالمعرف
   static async findById(id) {
+    if (!db) return null;
     try {
       const doc = await db.collection(COLLECTION).doc(id).get();
       if (!doc.exists) return null;
       return { id: doc.id, ...doc.data() };
     } catch (error) {
       console.error('Error finding student by id:', error);
-      throw error;
+      return null;
     }
   }
 
-  // إنشاء طالب جديد
   static async create(data) {
+    if (!db) throw new Error('Database not available');
     try {
       const now = new Date().toISOString();
       const docRef = await db.collection(COLLECTION).add({
@@ -63,7 +53,6 @@ class StudentModel {
         memorizationTests: data.memorizationTests || [],
         monthlyPages: data.monthlyPages || []
       });
-      
       return { id: docRef.id, ...data };
     } catch (error) {
       console.error('Error creating student:', error);
@@ -71,19 +60,11 @@ class StudentModel {
     }
   }
 
-  // تحديث طالب
   static async update(id, data) {
+    if (!db) throw new Error('Database not available');
     try {
       const docRef = db.collection(COLLECTION).doc(id);
-      const doc = await docRef.get();
-      
-      if (!doc.exists) return null;
-      
-      await docRef.update({
-        ...data,
-        updatedAt: new Date().toISOString()
-      });
-      
+      await docRef.update({ ...data, updatedAt: new Date().toISOString() });
       const updated = await docRef.get();
       return { id: updated.id, ...updated.data() };
     } catch (error) {
@@ -92,8 +73,8 @@ class StudentModel {
     }
   }
 
-  // حذف طالب
   static async delete(id) {
+    if (!db) throw new Error('Database not available');
     try {
       await db.collection(COLLECTION).doc(id).delete();
       return true;
@@ -103,26 +84,20 @@ class StudentModel {
     }
   }
 
-  // إضافة اختبار
   static async addTest(studentId, testType, testData) {
+    if (!db) throw new Error('Database not available');
     try {
       const student = await this.findById(studentId);
       if (!student) throw new Error('Student not found');
       
       const tests = student[testType] || [];
-      const newTest = {
+      tests.push({
         ...testData,
         id: Date.now().toString(),
         createdAt: new Date().toISOString()
-      };
-      
-      tests.push(newTest);
-      
-      await db.collection(COLLECTION).doc(studentId).update({
-        [testType]: tests,
-        updatedAt: new Date().toISOString()
       });
       
+      await db.collection(COLLECTION).doc(studentId).update({ [testType]: tests });
       return tests;
     } catch (error) {
       console.error('Error adding test:', error);
@@ -130,8 +105,8 @@ class StudentModel {
     }
   }
 
-  // تحديث اختبار
   static async updateTest(studentId, testType, testIndex, testData) {
+    if (!db) throw new Error('Database not available');
     try {
       const student = await this.findById(studentId);
       if (!student) throw new Error('Student not found');
@@ -140,12 +115,7 @@ class StudentModel {
       if (!tests[testIndex]) throw new Error('Test not found');
       
       tests[testIndex] = { ...tests[testIndex], ...testData };
-      
-      await db.collection(COLLECTION).doc(studentId).update({
-        [testType]: tests,
-        updatedAt: new Date().toISOString()
-      });
-      
+      await db.collection(COLLECTION).doc(studentId).update({ [testType]: tests });
       return tests;
     } catch (error) {
       console.error('Error updating test:', error);
@@ -153,8 +123,8 @@ class StudentModel {
     }
   }
 
-  // حذف اختبار
   static async deleteTest(studentId, testType, testIndex) {
+    if (!db) throw new Error('Database not available');
     try {
       const student = await this.findById(studentId);
       if (!student) throw new Error('Student not found');
@@ -163,12 +133,7 @@ class StudentModel {
       if (!tests[testIndex]) throw new Error('Test not found');
       
       tests.splice(testIndex, 1);
-      
-      await db.collection(COLLECTION).doc(studentId).update({
-        [testType]: tests,
-        updatedAt: new Date().toISOString()
-      });
-      
+      await db.collection(COLLECTION).doc(studentId).update({ [testType]: tests });
       return tests;
     } catch (error) {
       console.error('Error deleting test:', error);
@@ -176,24 +141,16 @@ class StudentModel {
     }
   }
 
-  // إضافة أو تحديث الصفحات الشهرية
   static async updateMonthlyPages(studentId, month, year, pages, goal = 20) {
+    if (!db) throw new Error('Database not available');
     try {
       const student = await this.findById(studentId);
       if (!student) throw new Error('Student not found');
       
       let monthlyPages = student.monthlyPages || [];
-      const existingIndex = monthlyPages.findIndex(
-        p => p.month === month && p.year === year
-      );
+      const existingIndex = monthlyPages.findIndex(p => p.month === month && p.year === year);
       
-      const pageData = {
-        month,
-        year,
-        pages,
-        goal,
-        lastUpdate: new Date().toISOString()
-      };
+      const pageData = { month, year, pages, goal, lastUpdate: new Date().toISOString() };
       
       if (existingIndex !== -1) {
         monthlyPages[existingIndex] = { ...monthlyPages[existingIndex], ...pageData };
@@ -201,43 +158,15 @@ class StudentModel {
         monthlyPages.push(pageData);
       }
       
-      // ترتيب حسب السنة والشهر (الأحدث أولاً)
       monthlyPages.sort((a, b) => {
         if (a.year !== b.year) return b.year - a.year;
         return b.month - a.month;
       });
       
-      await db.collection(COLLECTION).doc(studentId).update({
-        monthlyPages,
-        updatedAt: new Date().toISOString()
-      });
-      
+      await db.collection(COLLECTION).doc(studentId).update({ monthlyPages });
       return monthlyPages;
     } catch (error) {
       console.error('Error updating monthly pages:', error);
-      throw error;
-    }
-  }
-
-  // حذف صفحة شهرية
-  static async deleteMonthlyPage(studentId, pageIndex) {
-    try {
-      const student = await this.findById(studentId);
-      if (!student) throw new Error('Student not found');
-      
-      const monthlyPages = student.monthlyPages || [];
-      if (!monthlyPages[pageIndex]) throw new Error('Page not found');
-      
-      monthlyPages.splice(pageIndex, 1);
-      
-      await db.collection(COLLECTION).doc(studentId).update({
-        monthlyPages,
-        updatedAt: new Date().toISOString()
-      });
-      
-      return monthlyPages;
-    } catch (error) {
-      console.error('Error deleting monthly page:', error);
       throw error;
     }
   }
