@@ -1,15 +1,16 @@
 const express = require("express");
-const Student = require("../models/Student");
+const Student = require("../models/StudentFirebase");
 const router = express.Router();
 
 /* تسجيل الدخول بكود الطالب */
 router.post("/login", async (req, res) => {
   const { code } = req.body;
   try {
-    const student = await Student.findOne({ code });
+    const student = await Student.findByCode(code);
     if (!student) return res.status(404).json({ message: "كود الدخول غير صحيح" });
     res.json(student);
   } catch (err) {
+    console.error("Login error:", err);
     res.status(500).json({ message: "خطأ في السيرفر" });
   }
 });
@@ -17,9 +18,10 @@ router.post("/login", async (req, res) => {
 /* جلب جميع الطلاب */
 router.get("/", async (req, res) => {
   try {
-    const students = await Student.find();
+    const students = await Student.findAll();
     res.json(students);
   } catch (err) {
+    console.error("Error fetching students:", err);
     res.status(500).json({ message: "خطأ في جلب الطلاب" });
   }
 });
@@ -27,10 +29,16 @@ router.get("/", async (req, res) => {
 /* إضافة طالب جديد */
 router.post("/", async (req, res) => {
   try {
-    const student = new Student(req.body);
-    await student.save();
-    res.json(student);
+    // التحقق من عدم تكرار الكود
+    const existing = await Student.findByCode(req.body.code);
+    if (existing) {
+      return res.status(400).json({ message: "كود الدخول هذا مستخدم بالفعل" });
+    }
+    
+    const student = await Student.create(req.body);
+    res.status(201).json(student);
   } catch (err) {
+    console.error("Error creating student:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -38,14 +46,11 @@ router.post("/", async (req, res) => {
 /* تعديل بيانات طالب */
 router.put("/:id", async (req, res) => {
   try {
-    const student = await Student.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const student = await Student.update(req.params.id, req.body);
     if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
     res.json(student);
   } catch (err) {
+    console.error("Error updating student:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -53,10 +58,10 @@ router.put("/:id", async (req, res) => {
 /* حذف طالب */
 router.delete("/:id", async (req, res) => {
   try {
-    const student = await Student.findByIdAndDelete(req.params.id);
-    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
+    await Student.delete(req.params.id);
     res.json({ message: "تم حذف الطالب" });
   } catch (err) {
+    console.error("Error deleting student:", err);
     res.status(500).json({ message: "خطأ أثناء الحذف" });
   }
 });
@@ -68,16 +73,22 @@ router.post("/:id/tests", async (req, res) => {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
 
-    const newTest = { testName, lessonName: testName, result, date };
+    const newTest = { testName, lessonName: testName, result, date: date || new Date().toISOString().split('T')[0] };
+    
+    let updatedTests;
+    if (testType === "lessonTests") {
+      updatedTests = await Student.addTest(req.params.id, testType, newTest);
+    } else if (testType === "tajweedTests") {
+      updatedTests = await Student.addTest(req.params.id, testType, newTest);
+    } else if (testType === "memorizationTests") {
+      updatedTests = await Student.addTest(req.params.id, testType, newTest);
+    } else {
+      return res.status(400).json({ message: "نوع الاختبار غير صحيح" });
+    }
 
-    if (testType === "lessonTests") student.lessonTests.push(newTest);
-    else if (testType === "tajweedTests") student.tajweedTests.push(newTest);
-    else if (testType === "memorizationTests") student.memorizationTests.push(newTest);
-    else return res.status(400).json({ message: "نوع الاختبار غير صحيح" });
-
-    await student.save();
-    res.json(student);
+    res.json({ message: "تم إضافة الاختبار", tests: updatedTests });
   } catch (err) {
+    console.error("Error adding test:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -88,28 +99,16 @@ router.put("/:id/tests/:testIndex", async (req, res) => {
   const { id, testIndex } = req.params;
   
   try {
-    const student = await Student.findById(id);
-    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
-
-    let testArray;
-    if (testType === "lessonTests") testArray = student.lessonTests;
-    else if (testType === "tajweedTests") testArray = student.tajweedTests;
-    else if (testType === "memorizationTests") testArray = student.memorizationTests;
-    else return res.status(400).json({ message: "نوع الاختبار غير صحيح" });
-
-    if (testIndex < 0 || testIndex >= testArray.length) {
-      return res.status(404).json({ message: "الاختبار غير موجود" });
-    }
-
-    // تحديث بيانات الاختبار
-    testArray[testIndex].testName = testName;
-    testArray[testIndex].lessonName = testName;
-    testArray[testIndex].result = result;
-    testArray[testIndex].date = date;
-
-    await student.save();
-    res.json(student);
+    const updatedTests = await Student.updateTest(id, testType, parseInt(testIndex), {
+      testName,
+      lessonName: testName,
+      result,
+      date
+    });
+    
+    res.json({ message: "تم تعديل الاختبار", tests: updatedTests });
   } catch (err) {
+    console.error("Error updating test:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -120,25 +119,10 @@ router.delete("/:id/tests/:testIndex", async (req, res) => {
   const { id, testIndex } = req.params;
   
   try {
-    const student = await Student.findById(id);
-    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
-
-    let testArray;
-    if (testType === "lessonTests") testArray = student.lessonTests;
-    else if (testType === "tajweedTests") testArray = student.tajweedTests;
-    else if (testType === "memorizationTests") testArray = student.memorizationTests;
-    else return res.status(400).json({ message: "نوع الاختبار غير صحيح" });
-
-    if (testIndex < 0 || testIndex >= testArray.length) {
-      return res.status(404).json({ message: "الاختبار غير موجود" });
-    }
-
-    // حذف الاختبار
-    testArray.splice(testIndex, 1);
-
-    await student.save();
-    res.json(student);
+    const updatedTests = await Student.deleteTest(id, testType, parseInt(testIndex));
+    res.json({ message: "تم حذف الاختبار", tests: updatedTests });
   } catch (err) {
+    console.error("Error deleting test:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -147,10 +131,6 @@ router.delete("/:id/tests/:testIndex", async (req, res) => {
 router.post("/:id/monthly-pages", async (req, res) => {
   const { month, year, pages, goal } = req.body;
   
-  console.log("📝 Received monthly pages data:", req.body);
-  console.log("🎯 Student ID:", req.params.id);
-  
-  // التحقق من البيانات المدخلة
   if (!month || !year || pages === undefined) {
     return res.status(400).json({ 
       message: "البيانات ناقصة. يرجى إدخال الشهر والسنة وعدد الصفحات" 
@@ -161,99 +141,22 @@ router.post("/:id/monthly-pages", async (req, res) => {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
 
-    // البحث عن بيانات الشهر إن كانت موجودة
-    const existingIndex = student.monthlyPages.findIndex(
-      m => m.month === parseInt(month) && m.year === parseInt(year)
+    const updatedPages = await Student.updateMonthlyPages(
+      req.params.id, 
+      parseInt(month), 
+      parseInt(year), 
+      parseInt(pages), 
+      goal ? parseInt(goal) : 20
     );
-
-    if (existingIndex !== -1) {
-      // تحديث البيانات الموجودة
-      student.monthlyPages[existingIndex].pages = parseInt(pages);
-      student.monthlyPages[existingIndex].goal = goal ? parseInt(goal) : 20;
-      student.monthlyPages[existingIndex].lastUpdate = new Date();
-    } else {
-      // إضافة بيانات جديدة
-      student.monthlyPages.push({
-        month: parseInt(month),
-        year: parseInt(year),
-        pages: parseInt(pages),
-        goal: goal ? parseInt(goal) : 20,
-        lastUpdate: new Date()
-      });
-    }
-
-    await student.save();
-    console.log("✅ Monthly pages saved successfully");
     
     res.json({ 
       message: "تم حفظ بيانات الصفحات بنجاح",
-      student 
+      monthlyPages: updatedPages 
     });
   } catch (err) {
-    console.error("❌ Error saving monthly pages:", err);
+    console.error("Error saving monthly pages:", err);
     res.status(500).json({ 
       message: "حدث خطأ أثناء حفظ البيانات: " + err.message 
-    });
-  }
-});
-
-/* تعديل الصفحات الشهرية */
-router.put("/:id/monthly-pages/:pageIndex", async (req, res) => {
-  const { month, year, pages, goal } = req.body;
-  const { id, pageIndex } = req.params;
-  
-  try {
-    const student = await Student.findById(id);
-    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
-
-    if (pageIndex < 0 || pageIndex >= student.monthlyPages.length) {
-      return res.status(404).json({ message: "بيانات الصفحات غير موجودة" });
-    }
-
-    // تحديث بيانات الصفحات
-    student.monthlyPages[pageIndex].month = parseInt(month);
-    student.monthlyPages[pageIndex].year = parseInt(year);
-    student.monthlyPages[pageIndex].pages = parseInt(pages);
-    student.monthlyPages[pageIndex].goal = goal ? parseInt(goal) : 20;
-    student.monthlyPages[pageIndex].lastUpdate = new Date();
-
-    await student.save();
-    res.json({ 
-      message: "تم تعديل بيانات الصفحات بنجاح",
-      student 
-    });
-  } catch (err) {
-    console.error("❌ Error updating monthly pages:", err);
-    res.status(500).json({ 
-      message: "حدث خطأ أثناء تعديل البيانات: " + err.message 
-    });
-  }
-});
-
-/* حذف الصفحات الشهرية */
-router.delete("/:id/monthly-pages/:pageIndex", async (req, res) => {
-  const { id, pageIndex } = req.params;
-  
-  try {
-    const student = await Student.findById(id);
-    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
-
-    if (pageIndex < 0 || pageIndex >= student.monthlyPages.length) {
-      return res.status(404).json({ message: "بيانات الصفحات غير موجودة" });
-    }
-
-    // حذف بيانات الصفحات
-    student.monthlyPages.splice(pageIndex, 1);
-
-    await student.save();
-    res.json({ 
-      message: "تم حذف بيانات الصفحات بنجاح",
-      student 
-    });
-  } catch (err) {
-    console.error("❌ Error deleting monthly pages:", err);
-    res.status(500).json({ 
-      message: "حدث خطأ أثناء حذف البيانات: " + err.message 
     });
   }
 });
