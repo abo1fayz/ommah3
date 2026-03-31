@@ -1,14 +1,14 @@
-const mongoose = require("mongoose");
+const { db } = require('./firebase-admin');
 
+// دالة للتحقق من الاتصال
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || "mongodb+srv://GM-MOHAMED:Sqdl0o6aZgGE2DmA@cluster0.ljrua7h.mongodb.net/all-data?retryWrites=true&w=majority&appName=Cluster0", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("✅ MongoDB Connected");
+    // اختبار الاتصال بمحاولة قراءة بسيطة
+    await db.collection('_test').limit(1).get();
+    console.log('✅ Firebase Firestore connected successfully');
+    return true;
   } catch (error) {
-    console.error("❌ DB Connection Failed:", error.message);
+    console.error('❌ Firebase connection error:', error.message);
     process.exit(1);
   }
 };
