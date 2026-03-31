@@ -15,15 +15,12 @@
     "cloudinary": "^1.41.0",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
-    "firebase-admin": "^11.11.1"
+    "firebase": "^10.7.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
   "engines": {
     "node": ">=18.x"
-  },
-  "keywords": ["institute", "management", "education"],
-  "author": "Ommah Institute",
-  "license": "MIT"
+  }
 }
