@@ -3,12 +3,16 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
-// إزالة connectDB واستبدالها بـ Firebase
-// const connectDB = require("./config/db");
+// الاتصال بـ Firebase بدلاً من MongoDB
+const connectDB = require("./config/db");
 
+// استيراد المسارات
 const studentRoutes = require("./routes/studentRoutes");
 const competitionRoutes = require("./routes/competitionRoutes");
 const achievementRoutes = require("./routes/achievementRoutes");
+
+// الاتصال بقاعدة البيانات
+connectDB();
 
 // إنشاء السيرفر
 const app = express();
@@ -57,7 +61,6 @@ if (require.main === module) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
-    console.log(`📁 Firebase Storage ready`);
   });
 }
 
