@@ -38,7 +38,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .header {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
@@ -67,14 +66,12 @@
             font-size: 0.9rem;
         }
 
-        /* Container */
         .container {
             max-width: 1400px;
             margin: 30px auto;
             padding: 0 20px;
         }
 
-        /* Dashboard Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -116,7 +113,6 @@
             color: var(--primary-dark);
         }
 
-        /* Dashboard Card */
         .dashboard-card {
             background: white;
             border-radius: var(--border-radius);
@@ -125,7 +121,6 @@
             margin-bottom: 30px;
         }
 
-        /* Tabs */
         .tabs {
             display: flex;
             flex-wrap: wrap;
@@ -162,7 +157,6 @@
             font-size: 1.1rem;
         }
 
-        /* Tab Content */
         .tab-content {
             display: none;
             padding: 25px;
@@ -178,7 +172,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Section Title */
         .section-title {
             display: flex;
             align-items: center;
@@ -194,7 +187,6 @@
             font-size: 1.3rem;
         }
 
-        /* Forms */
         .form-group {
             margin-bottom: 20px;
         }
@@ -233,17 +225,12 @@
             box-shadow: 0 0 0 3px rgba(44, 120, 108, 0.1);
         }
 
-        input.error, select.error, textarea.error {
-            border-color: var(--danger);
-        }
-
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
 
-        /* Buttons */
         .btn {
             padding: 12px 24px;
             border: none;
@@ -263,9 +250,14 @@
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(44, 120, 108, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
         .btn-danger {
@@ -296,7 +288,6 @@
             font-size: 13px;
         }
 
-        /* Messages */
         .message {
             padding: 15px 20px;
             border-radius: 10px;
@@ -335,15 +326,8 @@
             border-right: 4px solid var(--info);
         }
 
-        .message.warning {
-            background: linear-gradient(135deg, #fff3cd, #ffeeba);
-            color: #856404;
-            border-right: 4px solid var(--warning);
-        }
-
-        .message i {
+        .message i:first-child {
             margin-left: 10px;
-            font-size: 1.1rem;
         }
 
         .message .close-message {
@@ -360,7 +344,6 @@
             opacity: 1;
         }
 
-        /* Lists */
         .student-list, .competition-list, .achievement-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -423,17 +406,6 @@
             border-top: 1px solid #e0e0e0;
         }
 
-        .test-item, .winner-item {
-            background: var(--gray-light);
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Loading */
         .loading {
             text-align: center;
             padding: 40px;
@@ -453,7 +425,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -518,7 +489,6 @@
             padding: 20px;
         }
 
-        /* Image Preview */
         .image-preview {
             display: flex;
             gap: 10px;
@@ -534,7 +504,6 @@
             border: 2px solid #e0e0e0;
         }
 
-        /* No Data */
         .no-data {
             text-align: center;
             padding: 40px;
@@ -547,14 +516,12 @@
             opacity: 0.5;
         }
 
-        /* Help Text */
         .help-text {
             font-size: 0.8rem;
             color: var(--gray);
             margin-top: 5px;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 padding: 0 15px;
@@ -597,27 +564,26 @@
     </div>
     
     <div class="container">
-        <!-- إحصائيات سريعة -->
         <div class="stats-grid" id="statsGrid">
-            <div class="stat-card" onclick="document.querySelector('[data-tab=\'students\']').click()">
+            <div class="stat-card" onclick="switchToTab('students')">
                 <i class="fas fa-users"></i>
                 <h3>إجمالي الطلاب</h3>
                 <div class="stat-number" id="totalStudents">0</div>
             </div>
-            <div class="stat-card" onclick="document.querySelector('[data-tab=\'competitions\']').click()">
+            <div class="stat-card" onclick="switchToTab('competitions')">
                 <i class="fas fa-trophy"></i>
                 <h3>المسابقات</h3>
                 <div class="stat-number" id="totalCompetitions">0</div>
             </div>
-            <div class="stat-card" onclick="document.querySelector('[data-tab=\'achievements\']').click()">
+            <div class="stat-card" onclick="switchToTab('achievements')">
                 <i class="fas fa-star"></i>
                 <h3>الإنجازات</h3>
                 <div class="stat-number" id="totalAchievements">0</div>
             </div>
-            <div class="stat-card" onclick="document.querySelector('[data-tab=\'add-student\']').click()">
+            <div class="stat-card" onclick="switchToTab('add-student')">
                 <i class="fas fa-user-plus"></i>
                 <h3>إضافة جديدة</h3>
-                <div class="stat-number" id="quickAdd">+</div>
+                <div class="stat-number" style="font-size: 2rem;">+</div>
             </div>
         </div>
 
@@ -657,7 +623,6 @@
                 </div>
             </div>
             
-            <!-- إدارة الطلاب -->
             <div class="tab-content active" id="students">
                 <div class="section-title">
                     <i class="fas fa-users"></i>
@@ -666,7 +631,6 @@
                 <div class="student-list" id="studentsList"></div>
             </div>
             
-            <!-- إضافة طالب جديد -->
             <div class="tab-content" id="add-student">
                 <div class="section-title">
                     <i class="fas fa-user-plus"></i>
@@ -702,7 +666,6 @@
                 <div id="studentMessage" class="message"></div>
             </div>
             
-            <!-- إضافة اختبار -->
             <div class="tab-content" id="add-test">
                 <div class="section-title">
                     <i class="fas fa-clipboard-list"></i>
@@ -711,8 +674,9 @@
                 
                 <div class="form-group">
                     <label for="testStudent">اختر الطالب <span class="required">*</span></label>
-                    <select id="testStudent"></select>
-                    <div class="help-text">اختر الطالب الذي تريد إضافة اختبار له</div>
+                    <select id="testStudent">
+                        <option value="">-- اختر الطالب --</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -727,13 +691,11 @@
                 <div class="form-group">
                     <label for="testName">اسم الاختبار <span class="required">*</span></label>
                     <input type="text" id="testName" placeholder="مثال: سورة الفاتحة - الدرس الأول">
-                    <div class="help-text">أدخل اسم واضح للاختبار</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="testResult">النتيجة (من 100) <span class="required">*</span></label>
                     <input type="number" id="testResult" min="0" max="100" placeholder="مثال: 85">
-                    <div class="help-text">أدخل درجة الطالب من 0 إلى 100</div>
                 </div>
                 
                 <div class="form-group">
@@ -748,7 +710,6 @@
                 <div id="testMessage" class="message"></div>
             </div>
             
-            <!-- إدارة الصفحات الشهرية -->
             <div class="tab-content" id="monthly-pages">
                 <div class="section-title">
                     <i class="fas fa-calendar-alt"></i>
@@ -757,7 +718,9 @@
                 
                 <div class="form-group">
                     <label for="pagesStudent">اختر الطالب <span class="required">*</span></label>
-                    <select id="pagesStudent"></select>
+                    <select id="pagesStudent">
+                        <option value="">-- اختر الطالب --</option>
+                    </select>
                 </div>
                 
                 <div class="form-row">
@@ -789,13 +752,11 @@
                     <div class="form-group">
                         <label for="pagesCount">عدد الصفحات المحفوظة <span class="required">*</span></label>
                         <input type="number" id="pagesCount" min="0" placeholder="مثال: 15">
-                        <div class="help-text">عدد الصفحات التي حفظها الطالب هذا الشهر</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="pagesGoal">الهدف الشهري</label>
                         <input type="number" id="pagesGoal" min="1" value="20">
-                        <div class="help-text">الهدف المطلوب حفظه شهرياً (افتراضي: 20 صفحة)</div>
                     </div>
                 </div>
                 
@@ -806,7 +767,6 @@
                 <div id="pagesMessage" class="message"></div>
             </div>
 
-            <!-- إدارة المسابقات -->
             <div class="tab-content" id="competitions">
                 <div class="section-title">
                     <i class="fas fa-trophy"></i>
@@ -815,7 +775,6 @@
                 <div class="competition-list" id="competitionsList"></div>
             </div>
 
-            <!-- إضافة مسابقة -->
             <div class="tab-content" id="add-competition">
                 <div class="section-title">
                     <i class="fas fa-plus-circle"></i>
@@ -870,7 +829,6 @@
                 <div id="competitionMessage" class="message"></div>
             </div>
 
-            <!-- إدارة الإنجازات -->
             <div class="tab-content" id="achievements">
                 <div class="section-title">
                     <i class="fas fa-medal"></i>
@@ -879,7 +837,6 @@
                 <div class="achievement-list" id="achievementsList"></div>
             </div>
 
-            <!-- إضافة إنجاز -->
             <div class="tab-content" id="add-achievement">
                 <div class="section-title">
                     <i class="fas fa-plus-circle"></i>
@@ -900,7 +857,6 @@
                     <label for="achievementImages">صور الإنجاز <span class="optional">(اختياري - يمكن اختيار عدة صور)</span></label>
                     <input type="file" id="achievementImages" accept="image/*" multiple>
                     <div id="imagePreview" class="image-preview"></div>
-                    <div class="help-text">يمكنك اختيار أكثر من صورة (jpg, png, gif) - حجم كل صورة أقل من 5 ميجابايت</div>
                 </div>
                 
                 <div class="form-group">
@@ -980,7 +936,6 @@
                 <div class="form-group">
                     <label>كود الطالب <span class="optional">(اختياري)</span></label>
                     <input type="text" id="winnerStudentCode" maxlength="6" placeholder="أدخل كود الطالب إذا كان مسجلاً">
-                    <div class="help-text">إذا كان الطالب مسجلاً في النظام، سيتم ربط بياناته تلقائياً</div>
                 </div>
                 <div class="form-group">
                     <label>المركز/الوصف <span class="required">*</span></label>
@@ -1012,18 +967,15 @@
         let studentsData = [];
         let competitionsData = [];
         let achievementsData = [];
-        let currentCompetitionId = null;
 
         // ==================== دوال مساعدة ====================
         
-        // عرض رسالة
         function showMessage(elementId, text, type, duration = 5000) {
             const element = document.getElementById(elementId);
             if (!element) return;
             
             const icon = type === 'success' ? 'fa-check-circle' : 
-                        type === 'error' ? 'fa-exclamation-circle' : 
-                        type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+                        type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
             
             element.innerHTML = `
                 <i class="fas ${icon}"></i>
@@ -1033,7 +985,6 @@
             element.className = `message ${type}`;
             element.style.display = 'block';
             
-            // إخفاء تلقائي
             setTimeout(() => {
                 if (element.style.display !== 'none') {
                     element.style.display = 'none';
@@ -1041,17 +992,19 @@
             }, duration);
         }
 
-        // إغلاق المودال
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // فتح المودال
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
         }
 
-        // تنسيق التاريخ
+        function switchToTab(tabId) {
+            const tab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+            if (tab) tab.click();
+        }
+
         function formatDate(dateString) {
             if (!dateString) return 'غير محدد';
             try {
@@ -1062,70 +1015,69 @@
             }
         }
 
-        // عرض حالة التحميل
-        function showLoading(containerId) {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>جاري التحميل...</p>
-                    </div>
-                `;
-            }
+        function updateStats() {
+            document.getElementById('totalStudents').textContent = studentsData.length;
+            document.getElementById('totalCompetitions').textContent = competitionsData.length;
+            document.getElementById('totalAchievements').textContent = achievementsData.length;
+        }
+
+        async function refreshAllData() {
+            console.log('🔄 جاري تحديث جميع البيانات...');
+            await Promise.all([
+                fetchStudents(),
+                fetchCompetitions(),
+                fetchAchievements()
+            ]);
+            console.log('✅ تم تحديث جميع البيانات');
         }
 
         // ==================== جلب البيانات ====================
         
-        // جلب الطلاب
         async function fetchStudents() {
             try {
                 const res = await fetch(`${API_URL}/students`);
+                if (!res.ok) throw new Error('فشل في جلب البيانات');
                 studentsData = await res.json();
                 renderStudents(studentsData);
                 updateStudentSelects();
-                document.getElementById('totalStudents').textContent = studentsData.length;
+                updateStats();
                 return studentsData;
             } catch (error) {
                 console.error('Error fetching students:', error);
-                showMessage('studentMessage', 'حدث خطأ في جلب بيانات الطلاب', 'error');
                 return [];
             }
         }
 
-        // جلب المسابقات
         async function fetchCompetitions() {
             try {
                 const res = await fetch(`${API_URL}/competitions`);
+                if (!res.ok) throw new Error('فشل في جلب البيانات');
                 competitionsData = await res.json();
                 renderCompetitions(competitionsData);
-                document.getElementById('totalCompetitions').textContent = competitionsData.length;
+                updateStats();
                 return competitionsData;
             } catch (error) {
                 console.error('Error fetching competitions:', error);
-                showMessage('competitionMessage', 'حدث خطأ في جلب بيانات المسابقات', 'error');
                 return [];
             }
         }
 
-        // جلب الإنجازات
         async function fetchAchievements() {
             try {
                 const res = await fetch(`${API_URL}/achievements`);
+                if (!res.ok) throw new Error('فشل في جلب البيانات');
                 achievementsData = await res.json();
                 renderAchievements(achievementsData);
-                document.getElementById('totalAchievements').textContent = achievementsData.length;
+                updateStats();
                 return achievementsData;
             } catch (error) {
                 console.error('Error fetching achievements:', error);
-                showMessage('achievementMessage', 'حدث خطأ في جلب بيانات الإنجازات', 'error');
                 return [];
             }
         }
 
         // ==================== عرض البيانات ====================
         
-        // عرض الطلاب
         function renderStudents(students) {
             const container = document.getElementById('studentsList');
             if (!container) return;
@@ -1135,7 +1087,7 @@
                     <div class="no-data">
                         <i class="fas fa-user-graduate"></i>
                         <p>لا يوجد طلاب مسجلين حالياً</p>
-                        <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-tab=\'add-student\']').click()">
+                        <button class="btn btn-primary btn-sm" onclick="switchToTab('add-student')">
                             <i class="fas fa-plus"></i> إضافة طالب جديد
                         </button>
                     </div>
@@ -1146,7 +1098,7 @@
             container.innerHTML = students.map(student => `
                 <div class="student-card">
                     <div class="student-header">
-                        <div class="student-name">${student.name || 'غير محدد'}</div>
+                        <div class="student-name">${escapeHtml(student.name || 'غير محدد')}</div>
                         <div class="student-code">${student.code || '---'}</div>
                     </div>
                     <div><i class="fas fa-chart-line"></i> المستوى: ${student.overallLevel || 'مبتدئ'}</div>
@@ -1166,7 +1118,6 @@
             `).join('');
         }
 
-        // عرض المسابقات
         function renderCompetitions(competitions) {
             const container = document.getElementById('competitionsList');
             if (!container) return;
@@ -1176,7 +1127,7 @@
                     <div class="no-data">
                         <i class="fas fa-trophy"></i>
                         <p>لا توجد مسابقات مسجلة</p>
-                        <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-tab=\'add-competition\']').click()">
+                        <button class="btn btn-primary btn-sm" onclick="switchToTab('add-competition')">
                             <i class="fas fa-plus"></i> إضافة مسابقة جديدة
                         </button>
                     </div>
@@ -1187,7 +1138,7 @@
             container.innerHTML = competitions.map(comp => `
                 <div class="competition-card">
                     <div class="competition-header">
-                        <div class="competition-title">${comp.title || 'بدون عنوان'}</div>
+                        <div class="competition-title">${escapeHtml(comp.title || 'بدون عنوان')}</div>
                         <span class="status-badge status-${comp.status === 'قادمة' ? 'upcoming' : comp.status === 'جارية' ? 'ongoing' : 'finished'}">
                             ${comp.status || 'قادمة'}
                         </span>
@@ -1207,7 +1158,6 @@
             `).join('');
         }
 
-        // عرض الإنجازات
         function renderAchievements(achievements) {
             const container = document.getElementById('achievementsList');
             if (!container) return;
@@ -1217,7 +1167,7 @@
                     <div class="no-data">
                         <i class="fas fa-medal"></i>
                         <p>لا توجد إنجازات مسجلة</p>
-                        <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-tab=\'add-achievement\']').click()">
+                        <button class="btn btn-primary btn-sm" onclick="switchToTab('add-achievement')">
                             <i class="fas fa-plus"></i> إضافة إنجاز جديد
                         </button>
                     </div>
@@ -1228,10 +1178,10 @@
             container.innerHTML = achievements.map(ach => `
                 <div class="achievement-card">
                     <div class="achievement-header">
-                        <div class="achievement-title">${ach.title || 'بدون عنوان'}</div>
+                        <div class="achievement-title">${escapeHtml(ach.title || 'بدون عنوان')}</div>
                         <div class="student-code">${formatDate(ach.date)}</div>
                     </div>
-                    <div>${ach.description ? (ach.description.length > 100 ? ach.description.substring(0, 100) + '...' : ach.description) : 'لا يوجد وصف'}</div>
+                    <div>${ach.description ? (ach.description.length > 100 ? ach.description.substring(0, 100) + '...' : escapeHtml(ach.description)) : 'لا يوجد وصف'}</div>
                     <div><i class="fas fa-images"></i> الصور: ${ach.images?.length || 0}</div>
                     <div><i class="fas fa-heart"></i> الإعجابات: ${ach.likes || 0}</div>
                     <div><i class="fas fa-comment"></i> التعليقات: ${ach.comments?.length || 0}</div>
@@ -1244,25 +1194,30 @@
             `).join('');
         }
 
-        // تحديث قوائم اختيار الطلاب
         function updateStudentSelects() {
             const testSelect = document.getElementById('testStudent');
             const pagesSelect = document.getElementById('pagesStudent');
             
             if (testSelect && studentsData.length > 0) {
                 testSelect.innerHTML = '<option value="">-- اختر الطالب --</option>' + 
-                    studentsData.map(s => `<option value="${s.id}">${s.name} (${s.code})</option>`).join('');
+                    studentsData.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${s.code})</option>`).join('');
             }
             
             if (pagesSelect && studentsData.length > 0) {
                 pagesSelect.innerHTML = '<option value="">-- اختر الطالب --</option>' + 
-                    studentsData.map(s => `<option value="${s.id}">${s.name} (${s.code})</option>`).join('');
+                    studentsData.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${s.code})</option>`).join('');
             }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // ==================== عمليات CRUD ====================
         
-        // إضافة طالب
         async function addStudent() {
             const name = document.getElementById('newStudentName').value.trim();
             const code = document.getElementById('newStudentCode').value.trim();
@@ -1286,6 +1241,11 @@
                 return;
             }
             
+            const saveBtn = document.getElementById('saveStudentBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            saveBtn.disabled = true;
+            
             try {
                 const response = await fetch(`${API_URL}/students`, {
                     method: "POST",
@@ -1298,18 +1258,21 @@
                 if (response.ok) {
                     document.getElementById('newStudentName').value = '';
                     document.getElementById('newStudentCode').value = '';
+                    await refreshAllData();
                     showMessage('studentMessage', `✅ تم إضافة الطالب "${name}" بنجاح`, 'success');
-                    fetchStudents();
+                    setTimeout(() => switchToTab('students'), 1500);
                 } else {
                     showMessage('studentMessage', data.message || 'فشل في إضافة الطالب', 'error');
                 }
             } catch (error) {
                 console.error('Error adding student:', error);
                 showMessage('studentMessage', 'حدث خطأ أثناء إضافة الطالب', 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         }
 
-        // حذف طالب
         async function deleteStudent(id) {
             const student = studentsData.find(s => s.id === id);
             if (!confirm(`⚠️ هل أنت متأكد من حذف الطالب "${student?.name}"؟\nسيتم حذف جميع اختباراته وبياناته.`)) return;
@@ -1318,8 +1281,8 @@
                 const response = await fetch(`${API_URL}/students/${id}`, { method: "DELETE" });
                 
                 if (response.ok) {
-                    showMessage('studentMessage', `✅ تم حذف الطالب بنجاح`, 'success');
-                    fetchStudents();
+                    await refreshAllData();
+                    showMessage('studentMessage', `✅ تم حذف الطالب "${student?.name}" بنجاح`, 'success');
                 } else {
                     throw new Error('فشل في حذف الطالب');
                 }
@@ -1329,7 +1292,6 @@
             }
         }
 
-        // فتح نافذة تعديل الطالب
         function openEditStudentModal(id) {
             const student = studentsData.find(s => s.id === id);
             if (student) {
@@ -1341,7 +1303,6 @@
             }
         }
 
-        // حفظ تعديل الطالب
         async function saveStudentEdit() {
             const id = document.getElementById('editStudentId').value;
             const name = document.getElementById('editStudentName').value.trim();
@@ -1358,6 +1319,11 @@
                 return;
             }
             
+            const saveBtn = document.getElementById('saveEditStudentBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            saveBtn.disabled = true;
+            
             try {
                 const response = await fetch(`${API_URL}/students/${id}`, {
                     method: 'PUT',
@@ -1367,8 +1333,8 @@
                 
                 if (response.ok) {
                     closeModal('editStudentModal');
+                    await refreshAllData();
                     showMessage('studentMessage', `✅ تم تحديث بيانات الطالب "${name}" بنجاح`, 'success');
-                    fetchStudents();
                 } else {
                     const data = await response.json();
                     showMessage('studentMessage', data.message || 'فشل في تحديث البيانات', 'error');
@@ -1376,10 +1342,12 @@
             } catch (error) {
                 console.error('Error updating student:', error);
                 showMessage('studentMessage', 'حدث خطأ أثناء تحديث البيانات', 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         }
 
-        // إضافة اختبار
         async function addTest() {
             const studentId = document.getElementById('testStudent').value;
             const testType = document.getElementById('testType').value;
@@ -1408,6 +1376,11 @@
                 return;
             }
             
+            const saveBtn = document.getElementById('saveTestBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            saveBtn.disabled = true;
+            
             try {
                 const response = await fetch(`${API_URL}/students/${studentId}/tests`, {
                     method: "POST",
@@ -1418,8 +1391,8 @@
                 if (response.ok) {
                     document.getElementById('testName').value = '';
                     document.getElementById('testResult').value = '';
+                    await refreshAllData();
                     showMessage('testMessage', '✅ تم إضافة الاختبار بنجاح', 'success');
-                    fetchStudents();
                 } else {
                     const data = await response.json();
                     showMessage('testMessage', data.message || 'فشل في إضافة الاختبار', 'error');
@@ -1427,10 +1400,12 @@
             } catch (error) {
                 console.error('Error adding test:', error);
                 showMessage('testMessage', 'حدث خطأ أثناء إضافة الاختبار', 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         }
 
-        // إضافة صفحات شهرية
         async function addMonthlyPages() {
             const studentId = document.getElementById('pagesStudent').value;
             const month = document.getElementById('pagesMonth').value;
@@ -1448,6 +1423,11 @@
                 return;
             }
             
+            const saveBtn = document.getElementById('savePagesBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            saveBtn.disabled = true;
+            
             try {
                 const response = await fetch(`${API_URL}/students/${studentId}/monthly-pages`, {
                     method: "POST",
@@ -1459,18 +1439,20 @@
                 
                 if (response.ok) {
                     document.getElementById('pagesCount').value = '';
+                    await refreshAllData();
                     showMessage('pagesMessage', data.message || '✅ تم حفظ البيانات بنجاح', 'success');
-                    fetchStudents();
                 } else {
                     showMessage('pagesMessage', data.message || 'فشل في حفظ البيانات', 'error');
                 }
             } catch (error) {
                 console.error('Error adding monthly pages:', error);
                 showMessage('pagesMessage', 'حدث خطأ أثناء حفظ البيانات', 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         }
 
-        // إضافة مسابقة
         async function addCompetition() {
             const title = document.getElementById('competitionTitle').value.trim();
             const type = document.getElementById('competitionType').value.trim();
@@ -1497,6 +1479,11 @@
                 return;
             }
             
+            const saveBtn = document.getElementById('saveCompetitionBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            saveBtn.disabled = true;
+            
             try {
                 const response = await fetch(`${API_URL}/competitions`, {
                     method: "POST",
@@ -1509,8 +1496,9 @@
                     document.getElementById('competitionType').value = '';
                     document.getElementById('competitionDescription').value = '';
                     document.getElementById('competitionLocation').value = '';
+                    await refreshAllData();
                     showMessage('competitionMessage', '✅ تم إضافة المسابقة بنجاح', 'success');
-                    fetchCompetitions();
+                    setTimeout(() => switchToTab('competitions'), 1500);
                 } else {
                     const data = await response.json();
                     showMessage('competitionMessage', data.message || 'فشل في إضافة المسابقة', 'error');
@@ -1518,10 +1506,12 @@
             } catch (error) {
                 console.error('Error adding competition:', error);
                 showMessage('competitionMessage', 'حدث خطأ أثناء إضافة المسابقة', 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         }
 
-        // حذف مسابقة
         async function deleteCompetition(id) {
             const competition = competitionsData.find(c => c.id === id);
             if (!confirm(`⚠️ هل أنت متأكد من حذف المسابقة "${competition?.title}"؟\nسيتم حذف جميع الفائزين أيضاً.`)) return;
@@ -1530,8 +1520,8 @@
                 const response = await fetch(`${API_URL}/competitions/${id}`, { method: "DELETE" });
                 
                 if (response.ok) {
+                    await refreshAllData();
                     showMessage('competitionMessage', '✅ تم حذف المسابقة بنجاح', 'success');
-                    fetchCompetitions();
                 } else {
                     throw new Error('فشل في حذف المسابقة');
                 }
@@ -1541,9 +1531,7 @@
             }
         }
 
-        // فتح نافذة إضافة فائز
         function openAddWinnerModal(competitionId) {
-            currentCompetitionId = competitionId;
             document.getElementById('winnerCompetitionId').value = competitionId;
             document.getElementById('winnerStudentName').value = '';
             document.getElementById('winnerStudentCode').value = '';
@@ -1554,7 +1542,6 @@
             openModal('addWinnerModal');
         }
 
-        // حفظ الفائز
         async function saveWinner() {
             const competitionId = document.getElementById('winnerCompetitionId').value;
             const studentName = document.getElementById('winnerStudentName').value.trim();
@@ -1574,6 +1561,11 @@
                 return;
             }
             
+            const saveBtn = document.getElementById('saveWinnerBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            saveBtn.disabled = true;
+            
             try {
                 const response = await fetch(`${API_URL}/competitions/${competitionId}/winners`, {
                     method: 'POST',
@@ -1583,8 +1575,8 @@
                 
                 if (response.ok) {
                     closeModal('addWinnerModal');
+                    await refreshAllData();
                     showMessage('competitionMessage', '✅ تم إضافة الفائز بنجاح', 'success');
-                    fetchCompetitions();
                 } else {
                     const data = await response.json();
                     showMessage('competitionMessage', data.message || 'فشل في إضافة الفائز', 'error');
@@ -1592,10 +1584,12 @@
             } catch (error) {
                 console.error('Error adding winner:', error);
                 showMessage('competitionMessage', 'حدث خطأ أثناء إضافة الفائز', 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         }
 
-        // إضافة إنجاز مع صور
         async function addAchievement() {
             const title = document.getElementById('achievementTitle').value.trim();
             const description = document.getElementById('achievementDescription').value.trim();
@@ -1614,6 +1608,11 @@
                 document.getElementById('achievementDescription').focus();
                 return;
             }
+            
+            const saveBtn = document.getElementById('saveAchievementBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+            saveBtn.disabled = true;
             
             try {
                 const formData = new FormData();
@@ -1637,8 +1636,9 @@
                     document.getElementById('achievementTags').value = '';
                     document.getElementById('achievementImages').value = '';
                     document.getElementById('imagePreview').innerHTML = '';
+                    await refreshAllData();
                     showMessage('achievementMessage', `✅ تم إضافة الإنجاز بنجاح مع ${imageFiles.length} صورة`, 'success');
-                    fetchAchievements();
+                    setTimeout(() => switchToTab('achievements'), 1500);
                 } else {
                     const data = await response.json();
                     showMessage('achievementMessage', data.message || 'فشل في إضافة الإنجاز', 'error');
@@ -1646,10 +1646,12 @@
             } catch (error) {
                 console.error('Error adding achievement:', error);
                 showMessage('achievementMessage', 'حدث خطأ أثناء إضافة الإنجاز', 'error');
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
             }
         }
 
-        // حذف إنجاز
         async function deleteAchievement(id) {
             const achievement = achievementsData.find(a => a.id === id);
             if (!confirm(`⚠️ هل أنت متأكد من حذف الإنجاز "${achievement?.title}"؟\nسيتم حذف جميع الصور والتعليقات أيضاً.`)) return;
@@ -1658,8 +1660,8 @@
                 const response = await fetch(`${API_URL}/achievements/${id}`, { method: "DELETE" });
                 
                 if (response.ok) {
+                    await refreshAllData();
                     showMessage('achievementMessage', '✅ تم حذف الإنجاز بنجاح', 'success');
-                    fetchAchievements();
                 } else {
                     throw new Error('فشل في حذف الإنجاز');
                 }
@@ -1669,7 +1671,6 @@
             }
         }
 
-        // معاينة الصور
         function previewAchievementImages(event) {
             const previewContainer = document.getElementById('imagePreview');
             previewContainer.innerHTML = '';
@@ -1692,7 +1693,6 @@
 
         // ==================== التهيئة ====================
         function setupEventListeners() {
-            // تبديل التبويبات
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabId = tab.getAttribute('data-tab');
@@ -1703,7 +1703,6 @@
                 });
             });
             
-            // أزرار الحفظ
             document.getElementById('saveStudentBtn')?.addEventListener('click', addStudent);
             document.getElementById('saveTestBtn')?.addEventListener('click', addTest);
             document.getElementById('savePagesBtn')?.addEventListener('click', addMonthlyPages);
@@ -1711,11 +1710,8 @@
             document.getElementById('saveAchievementBtn')?.addEventListener('click', addAchievement);
             document.getElementById('saveEditStudentBtn')?.addEventListener('click', saveStudentEdit);
             document.getElementById('saveWinnerBtn')?.addEventListener('click', saveWinner);
-            
-            // معاينة الصور
             document.getElementById('achievementImages')?.addEventListener('change', previewAchievementImages);
             
-            // إغلاق المودال بالضغط على ESC
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     document.querySelectorAll('.modal').forEach(modal => {
@@ -1724,7 +1720,6 @@
                 }
             });
             
-            // إغلاق المودال بالضغط خارج المحتوى
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
@@ -1734,12 +1729,9 @@
             });
         }
 
-        // تحميل البيانات الأولية
         document.addEventListener('DOMContentLoaded', () => {
             setupEventListeners();
-            fetchStudents();
-            fetchCompetitions();
-            fetchAchievements();
+            refreshAllData();
         });
     </script>
 </body>
