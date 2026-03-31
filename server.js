@@ -3,7 +3,9 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
-const { db } = require("./config/firebase");
+// استدعاء الاتصال بـ Firebase
+require("./config/firebase-client");
+
 const studentRoutes = require("./routes/studentRoutes");
 const competitionRoutes = require("./routes/competitionRoutes");
 const achievementRoutes = require("./routes/achievementRoutes");
