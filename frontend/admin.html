@@ -962,6 +962,34 @@
     </div>
 
     <script>
+
+
+
+
+
+
+
+// اختبار بسيط لجلب البيانات
+async function testFetch() {
+    console.log('🔍 اختبار جلب البيانات...');
+    try {
+        const res = await fetch('/api/students');
+        console.log('📡 حالة الاستجابة:', res.status);
+        const data = await res.json();
+        console.log('📊 عدد الطلاب:', data.length);
+        console.log('📝 أول طالب:', data[0]);
+        return data;
+    } catch (error) {
+        console.error('❌ خطأ في الجلب:', error);
+    }
+}
+
+// تشغيل الاختبار
+testFetch();
+
+
+
+
         // ==================== المتغيرات العامة ====================
         const API_URL = "/api";
         let studentsData = [];
