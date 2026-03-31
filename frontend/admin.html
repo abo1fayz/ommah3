@@ -1021,58 +1021,76 @@
             document.getElementById('totalAchievements').textContent = achievementsData.length;
         }
 
-        async function refreshAllData() {
-            console.log('🔄 جاري تحديث جميع البيانات...');
-            await Promise.all([
-                fetchStudents(),
-                fetchCompetitions(),
-                fetchAchievements()
-            ]);
-            console.log('✅ تم تحديث جميع البيانات');
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // ==================== جلب البيانات ====================
         
         async function fetchStudents() {
             try {
+                console.log('🔄 جلب بيانات الطلاب...');
                 const res = await fetch(`${API_URL}/students`);
                 if (!res.ok) throw new Error('فشل في جلب البيانات');
                 studentsData = await res.json();
+                console.log(`✅ تم جلب ${studentsData.length} طالب`);
                 renderStudents(studentsData);
                 updateStudentSelects();
                 updateStats();
                 return studentsData;
             } catch (error) {
-                console.error('Error fetching students:', error);
+                console.error('❌ Error fetching students:', error);
+                showMessage('studentMessage', 'حدث خطأ في جلب بيانات الطلاب', 'error');
                 return [];
             }
         }
 
         async function fetchCompetitions() {
             try {
+                console.log('🔄 جلب بيانات المسابقات...');
                 const res = await fetch(`${API_URL}/competitions`);
                 if (!res.ok) throw new Error('فشل في جلب البيانات');
                 competitionsData = await res.json();
+                console.log(`✅ تم جلب ${competitionsData.length} مسابقة`);
                 renderCompetitions(competitionsData);
                 updateStats();
                 return competitionsData;
             } catch (error) {
-                console.error('Error fetching competitions:', error);
+                console.error('❌ Error fetching competitions:', error);
                 return [];
             }
         }
 
         async function fetchAchievements() {
             try {
+                console.log('🔄 جلب بيانات الإنجازات...');
                 const res = await fetch(`${API_URL}/achievements`);
                 if (!res.ok) throw new Error('فشل في جلب البيانات');
                 achievementsData = await res.json();
+                console.log(`✅ تم جلب ${achievementsData.length} إنجاز`);
                 renderAchievements(achievementsData);
                 updateStats();
                 return achievementsData;
             } catch (error) {
-                console.error('Error fetching achievements:', error);
+                console.error('❌ Error fetching achievements:', error);
                 return [];
+            }
+        }
+
+        async function refreshAllData() {
+            console.log('🔄 جاري تحديث جميع البيانات...');
+            try {
+                await Promise.all([
+                    fetchStudents(),
+                    fetchCompetitions(),
+                    fetchAchievements()
+                ]);
+                console.log('✅ تم تحديث جميع البيانات بنجاح');
+            } catch (error) {
+                console.error('❌ خطأ في تحديث البيانات:', error);
             }
         }
 
@@ -1082,7 +1100,7 @@
             const container = document.getElementById('studentsList');
             if (!container) return;
             
-            if (students.length === 0) {
+            if (!students || students.length === 0) {
                 container.innerHTML = `
                     <div class="no-data">
                         <i class="fas fa-user-graduate"></i>
@@ -1122,7 +1140,7 @@
             const container = document.getElementById('competitionsList');
             if (!container) return;
             
-            if (competitions.length === 0) {
+            if (!competitions || competitions.length === 0) {
                 container.innerHTML = `
                     <div class="no-data">
                         <i class="fas fa-trophy"></i>
@@ -1162,7 +1180,7 @@
             const container = document.getElementById('achievementsList');
             if (!container) return;
             
-            if (achievements.length === 0) {
+            if (!achievements || achievements.length === 0) {
                 container.innerHTML = `
                     <div class="no-data">
                         <i class="fas fa-medal"></i>
@@ -1201,19 +1219,16 @@
             if (testSelect && studentsData.length > 0) {
                 testSelect.innerHTML = '<option value="">-- اختر الطالب --</option>' + 
                     studentsData.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${s.code})</option>`).join('');
+            } else if (testSelect) {
+                testSelect.innerHTML = '<option value="">لا يوجد طلاب</option>';
             }
             
             if (pagesSelect && studentsData.length > 0) {
                 pagesSelect.innerHTML = '<option value="">-- اختر الطالب --</option>' + 
                     studentsData.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${s.code})</option>`).join('');
+            } else if (pagesSelect) {
+                pagesSelect.innerHTML = '<option value="">لا يوجد طلاب</option>';
             }
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
 
         // ==================== عمليات CRUD ====================
@@ -1223,20 +1238,22 @@
             const code = document.getElementById('newStudentCode').value.trim();
             const level = document.getElementById('newStudentLevel').value;
             
+            console.log('📝 محاولة إضافة طالب:', { name, code, level });
+            
             if (!name) {
-                showMessage('studentMessage', 'الرجاء إدخال اسم الطالب', 'error');
+                showMessage('studentMessage', '⚠️ الرجاء إدخال اسم الطالب', 'error');
                 document.getElementById('newStudentName').focus();
                 return;
             }
             
             if (!code) {
-                showMessage('studentMessage', 'الرجاء إدخال كود الدخول', 'error');
+                showMessage('studentMessage', '⚠️ الرجاء إدخال كود الدخول', 'error');
                 document.getElementById('newStudentCode').focus();
                 return;
             }
             
             if (!/^\d{6}$/.test(code)) {
-                showMessage('studentMessage', 'كود الدخول يجب أن يكون 6 أرقام', 'error');
+                showMessage('studentMessage', '⚠️ كود الدخول يجب أن يكون 6 أرقام', 'error');
                 document.getElementById('newStudentCode').focus();
                 return;
             }
@@ -1249,24 +1266,36 @@
             try {
                 const response = await fetch(`${API_URL}/students`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
                     body: JSON.stringify({ name, code, overallLevel: level })
                 });
                 
                 const data = await response.json();
                 
                 if (response.ok) {
+                    // مسح الحقول
                     document.getElementById('newStudentName').value = '';
                     document.getElementById('newStudentCode').value = '';
+                    
+                    // تحديث البيانات فوراً
                     await refreshAllData();
+                    
                     showMessage('studentMessage', `✅ تم إضافة الطالب "${name}" بنجاح`, 'success');
-                    setTimeout(() => switchToTab('students'), 1500);
+                    
+                    // الانتقال إلى قائمة الطلاب بعد 1.5 ثانية
+                    setTimeout(() => {
+                        switchToTab('students');
+                    }, 1500);
                 } else {
-                    showMessage('studentMessage', data.message || 'فشل في إضافة الطالب', 'error');
+                    showMessage('studentMessage', `❌ ${data.message || 'فشل في إضافة الطالب'}`, 'error');
                 }
+                
             } catch (error) {
-                console.error('Error adding student:', error);
-                showMessage('studentMessage', 'حدث خطأ أثناء إضافة الطالب', 'error');
+                console.error('❌ خطأ في إضافة الطالب:', error);
+                showMessage('studentMessage', `❌ حدث خطأ: ${error.message}`, 'error');
             } finally {
                 saveBtn.innerHTML = originalText;
                 saveBtn.disabled = false;
@@ -1729,6 +1758,7 @@
             });
         }
 
+        // بدء التطبيق
         document.addEventListener('DOMContentLoaded', () => {
             setupEventListeners();
             refreshAllData();
