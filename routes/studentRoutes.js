@@ -73,7 +73,12 @@ router.post("/:id/tests", async (req, res) => {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
 
-    const newTest = { testName, lessonName: testName, result, date: date || new Date().toISOString().split('T')[0] };
+    const newTest = { 
+      testName, 
+      lessonName: testName, 
+      result, 
+      date: date || new Date().toISOString().split('T')[0] 
+    };
     
     let updatedTests;
     if (testType === "lessonTests") {
@@ -131,6 +136,8 @@ router.delete("/:id/tests/:testIndex", async (req, res) => {
 router.post("/:id/monthly-pages", async (req, res) => {
   const { month, year, pages, goal } = req.body;
   
+  console.log("📝 Received monthly pages data:", req.body);
+  
   if (!month || !year || pages === undefined) {
     return res.status(400).json({ 
       message: "البيانات ناقصة. يرجى إدخال الشهر والسنة وعدد الصفحات" 
@@ -149,14 +156,63 @@ router.post("/:id/monthly-pages", async (req, res) => {
       goal ? parseInt(goal) : 20
     );
     
+    console.log("✅ Monthly pages saved successfully");
+    
     res.json({ 
       message: "تم حفظ بيانات الصفحات بنجاح",
       monthlyPages: updatedPages 
     });
   } catch (err) {
-    console.error("Error saving monthly pages:", err);
+    console.error("❌ Error saving monthly pages:", err);
     res.status(500).json({ 
       message: "حدث خطأ أثناء حفظ البيانات: " + err.message 
+    });
+  }
+});
+
+/* تعديل الصفحات الشهرية */
+router.put("/:id/monthly-pages/:pageIndex", async (req, res) => {
+  const { month, year, pages, goal } = req.body;
+  const { id, pageIndex } = req.params;
+  
+  try {
+    const student = await Student.findById(id);
+    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
+
+    const monthlyPages = await Student.updateMonthlyPages(
+      id, 
+      parseInt(month), 
+      parseInt(year), 
+      parseInt(pages), 
+      goal ? parseInt(goal) : 20
+    );
+    
+    res.json({ 
+      message: "تم تعديل بيانات الصفحات بنجاح",
+      monthlyPages
+    });
+  } catch (err) {
+    console.error("❌ Error updating monthly pages:", err);
+    res.status(500).json({ 
+      message: "حدث خطأ أثناء تعديل البيانات: " + err.message 
+    });
+  }
+});
+
+/* حذف الصفحات الشهرية */
+router.delete("/:id/monthly-pages/:pageIndex", async (req, res) => {
+  const { id, pageIndex } = req.params;
+  
+  try {
+    const monthlyPages = await Student.deleteMonthlyPage(id, parseInt(pageIndex));
+    res.json({ 
+      message: "تم حذف بيانات الصفحات بنجاح",
+      monthlyPages
+    });
+  } catch (err) {
+    console.error("❌ Error deleting monthly pages:", err);
+    res.status(500).json({ 
+      message: "حدث خطأ أثناء حذف البيانات: " + err.message 
     });
   }
 });
