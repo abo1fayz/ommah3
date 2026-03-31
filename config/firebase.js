@@ -1,30 +1,33 @@
-// config/firebase.js
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
+require('dotenv').config();
 
-let db = null;
+// تهيئة Firebase Admin SDK
+let db;
 
 try {
-  // استخدام متغيرات البيئة لتهيئة Firebase
-  const firebaseConfig = {
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-  };
-
-  // التحقق من وجود جميع المتغيرات
-  if (firebaseConfig.projectId && firebaseConfig.clientEmail && firebaseConfig.privateKey) {
+  // محاولة التهيئة باستخدام service account key (للتشغيل المحلي)
+  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
     initializeApp({
-      credential: cert(firebaseConfig)
+      credential: cert(serviceAccount)
     });
-    
-    db = getFirestore();
-    console.log('✅ Firebase Firestore initialized');
   } else {
-    console.log('⚠️ Firebase credentials missing, running in demo mode');
+    // للتشغيل على Vercel - استخدام متغيرات البيئة
+    initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+      })
+    });
   }
+  
+  db = getFirestore();
+  console.log("✅ Firebase Connected");
 } catch (error) {
-  console.error('❌ Firebase initialization error:', error.message);
+  console.error("❌ Firebase Connection Failed:", error.message);
+  // عدم إنهاء العملية للسماح بالتشغيل على Vercel
 }
 
 module.exports = { db };
