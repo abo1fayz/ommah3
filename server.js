@@ -3,18 +3,24 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
-// الاتصال بـ Firebase بدلاً من MongoDB
-const connectDB = require("./config/db");
+// التحقق من البيئة
+const isVercel = process.env.VERCEL === '1';
+
+// استيراد Firebase فقط إذا كان متاحاً
+let db;
+try {
+  const firebase = require("./config/firebase-admin");
+  db = firebase.db;
+  console.log('✅ Firebase loaded');
+} catch (error) {
+  console.error('⚠️ Firebase not available:', error.message);
+}
 
 // استيراد المسارات
 const studentRoutes = require("./routes/studentRoutes");
 const competitionRoutes = require("./routes/competitionRoutes");
 const achievementRoutes = require("./routes/achievementRoutes");
 
-// الاتصال بقاعدة البيانات
-connectDB();
-
-// إنشاء السيرفر
 const app = express();
 
 // Middleware
@@ -22,13 +28,30 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// خدمة الملفات الثابتة من مجلد frontend
+// خدمة الملفات الثابتة
 app.use(express.static(path.join(__dirname, "frontend")));
 
-// API Routes
-app.use("/api/students", studentRoutes);
-app.use("/api/competitions", competitionRoutes);
-app.use("/api/achievements", achievementRoutes);
+// API Routes - مع معالجة الأخطاء
+app.use("/api/students", (req, res, next) => {
+  if (!db) {
+    return res.status(503).json({ message: "قاعدة البيانات غير متاحة حالياً" });
+  }
+  next();
+}, studentRoutes);
+
+app.use("/api/competitions", (req, res, next) => {
+  if (!db) {
+    return res.status(503).json({ message: "قاعدة البيانات غير متاحة حالياً" });
+  }
+  next();
+}, competitionRoutes);
+
+app.use("/api/achievements", (req, res, next) => {
+  if (!db) {
+    return res.status(503).json({ message: "قاعدة البيانات غير متاحة حالياً" });
+  }
+  next();
+}, achievementRoutes);
 
 // Routes للواجهات
 app.get("/", (req, res) => {
@@ -51,17 +74,14 @@ app.get("/achievements", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "achievements.html"));
 });
 
-// أي رابط غير معروف يرجع index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+// معالج الأخطاء العام
+app.use((err, req, res, next) => {
+  console.error('❌ Error:', err);
+  res.status(500).json({ 
+    message: "حدث خطأ في الخادم",
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
-// تشغيل السيرفر
-if (require.main === module) {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
-  });
-}
-
+// تصدير للتشغيل على Vercel
 module.exports = app;
