@@ -1,10 +1,11 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/firebase-client');
+const { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, query, orderBy } = require('firebase/firestore');
 
 const COLLECTION_NAME = 'competitions';
 
-const convertDoc = (doc) => {
-  if (!doc.exists) return null;
-  return { id: doc.id, ...doc.data() };
+const convertDoc = (docSnap) => {
+  if (!docSnap.exists()) return null;
+  return { id: docSnap.id, ...docSnap.data() };
 };
 
 const convertDocs = (snapshot) => {
@@ -17,96 +18,97 @@ const convertDocs = (snapshot) => {
 
 const CompetitionModel = {
   findAll: async () => {
-    const snapshot = await db.collection(COLLECTION_NAME)
-      .orderBy('date', 'desc')
-      .get();
+    const competitionsRef = collection(db, COLLECTION_NAME);
+    const q = query(competitionsRef, orderBy('date', 'desc'));
+    const snapshot = await getDocs(q);
     return convertDocs(snapshot);
   },
 
   findById: async (id) => {
-    const doc = await db.collection(COLLECTION_NAME).doc(id).get();
-    return convertDoc(doc);
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
+    return convertDoc(docSnap);
   },
 
   create: async (data) => {
-    const docRef = db.collection(COLLECTION_NAME).doc();
+    const competitionsRef = collection(db, COLLECTION_NAME);
     const newCompetition = {
       ...data,
       winners: data.winners || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    await docRef.set(newCompetition);
+    const docRef = await addDoc(competitionsRef, newCompetition);
     return { id: docRef.id, ...newCompetition };
   },
 
   update: async (id, data) => {
-    const docRef = db.collection(COLLECTION_NAME).doc(id);
-    const doc = await docRef.get();
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
     
-    if (!doc.exists) return null;
+    if (!docSnap.exists()) return null;
     
     const updateData = {
       ...data,
       updatedAt: new Date().toISOString()
     };
-    await docRef.update(updateData);
+    await updateDoc(docRef, updateData);
     
-    return { id, ...doc.data(), ...updateData };
+    return { id, ...docSnap.data(), ...updateData };
   },
 
   delete: async (id) => {
-    const docRef = db.collection(COLLECTION_NAME).doc(id);
-    const doc = await docRef.get();
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
     
-    if (!doc.exists) return null;
+    if (!docSnap.exists()) return null;
     
-    await docRef.delete();
-    return { id, ...doc.data() };
+    await deleteDoc(docRef);
+    return { id, ...docSnap.data() };
   },
 
   addWinner: async (competitionId, winner) => {
-    const docRef = db.collection(COLLECTION_NAME).doc(competitionId);
-    const doc = await docRef.get();
+    const docRef = doc(db, COLLECTION_NAME, competitionId);
+    const docSnap = await getDoc(docRef);
     
-    if (!doc.exists) return null;
+    if (!docSnap.exists()) return null;
     
-    const competition = doc.data();
+    const competition = docSnap.data();
     const winners = competition.winners || [];
     winners.push(winner);
     
-    await docRef.update({ winners });
+    await updateDoc(docRef, { winners });
     
     return { id: competitionId, ...competition, winners };
   },
 
   updateWinner: async (competitionId, winnerId, winnerData) => {
-    const docRef = db.collection(COLLECTION_NAME).doc(competitionId);
-    const doc = await docRef.get();
+    const docRef = doc(db, COLLECTION_NAME, competitionId);
+    const docSnap = await getDoc(docRef);
     
-    if (!doc.exists) return null;
+    if (!docSnap.exists()) return null;
     
-    const competition = doc.data();
+    const competition = docSnap.data();
     const winners = competition.winners || [];
     const index = winners.findIndex(w => w._id === winnerId);
     
     if (index === -1) return null;
     
     winners[index] = { ...winners[index], ...winnerData };
-    await docRef.update({ winners });
+    await updateDoc(docRef, { winners });
     
     return { id: competitionId, ...competition, winners };
   },
 
   deleteWinner: async (competitionId, winnerId) => {
-    const docRef = db.collection(COLLECTION_NAME).doc(competitionId);
-    const doc = await docRef.get();
+    const docRef = doc(db, COLLECTION_NAME, competitionId);
+    const docSnap = await getDoc(docRef);
     
-    if (!doc.exists) return null;
+    if (!docSnap.exists()) return null;
     
-    const competition = doc.data();
+    const competition = docSnap.data();
     const winners = (competition.winners || []).filter(w => w._id !== winnerId);
-    await docRef.update({ winners });
+    await updateDoc(docRef, { winners });
     
     return { id: competitionId, ...competition, winners };
   }
