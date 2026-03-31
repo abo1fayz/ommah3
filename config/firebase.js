@@ -1,18 +1,30 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+// config/firebase.js
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+let db = null;
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+try {
+  // استخدام متغيرات البيئة لتهيئة Firebase
+  const firebaseConfig = {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
+  };
 
-export { db, storage };
+  // التحقق من وجود جميع المتغيرات
+  if (firebaseConfig.projectId && firebaseConfig.clientEmail && firebaseConfig.privateKey) {
+    initializeApp({
+      credential: cert(firebaseConfig)
+    });
+    
+    db = getFirestore();
+    console.log('✅ Firebase Firestore initialized');
+  } else {
+    console.log('⚠️ Firebase credentials missing, running in demo mode');
+  }
+} catch (error) {
+  console.error('❌ Firebase initialization error:', error.message);
+}
+
+module.exports = { db };
