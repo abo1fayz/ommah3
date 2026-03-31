@@ -1,16 +1,15 @@
 const express = require("express");
-const Student = require("../models/StudentFirebase");
+const Student = require("../models/Student");
 const router = express.Router();
 
 /* تسجيل الدخول بكود الطالب */
 router.post("/login", async (req, res) => {
   const { code } = req.body;
   try {
-    const student = await Student.findByCode(code);
+    const student = await Student.findOne({ code });
     if (!student) return res.status(404).json({ message: "كود الدخول غير صحيح" });
     res.json(student);
   } catch (err) {
-    console.error("Login error:", err);
     res.status(500).json({ message: "خطأ في السيرفر" });
   }
 });
@@ -21,7 +20,6 @@ router.get("/", async (req, res) => {
     const students = await Student.findAll();
     res.json(students);
   } catch (err) {
-    console.error("Error fetching students:", err);
     res.status(500).json({ message: "خطأ في جلب الطلاب" });
   }
 });
@@ -30,15 +28,14 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     // التحقق من عدم تكرار الكود
-    const existing = await Student.findByCode(req.body.code);
-    if (existing) {
+    const existingStudent = await Student.findOne({ code: req.body.code });
+    if (existingStudent) {
       return res.status(400).json({ message: "كود الدخول هذا مستخدم بالفعل" });
     }
     
     const student = await Student.create(req.body);
-    res.status(201).json(student);
+    res.json(student);
   } catch (err) {
-    console.error("Error creating student:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -46,11 +43,18 @@ router.post("/", async (req, res) => {
 /* تعديل بيانات طالب */
 router.put("/:id", async (req, res) => {
   try {
+    // التحقق من عدم تكرار الكود
+    if (req.body.code) {
+      const existingStudent = await Student.findOne({ code: req.body.code });
+      if (existingStudent && existingStudent.id !== req.params.id) {
+        return res.status(400).json({ message: "كود الدخول هذا مستخدم بالفعل" });
+      }
+    }
+    
     const student = await Student.update(req.params.id, req.body);
     if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
     res.json(student);
   } catch (err) {
-    console.error("Error updating student:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -58,10 +62,10 @@ router.put("/:id", async (req, res) => {
 /* حذف طالب */
 router.delete("/:id", async (req, res) => {
   try {
-    await Student.delete(req.params.id);
+    const student = await Student.delete(req.params.id);
+    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
     res.json({ message: "تم حذف الطالب" });
   } catch (err) {
-    console.error("Error deleting student:", err);
     res.status(500).json({ message: "خطأ أثناء الحذف" });
   }
 });
@@ -73,27 +77,25 @@ router.post("/:id/tests", async (req, res) => {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
 
-    const newTest = { 
-      testName, 
-      lessonName: testName, 
-      result, 
-      date: date || new Date().toISOString().split('T')[0] 
-    };
-    
+    const newTest = { testName, lessonName: testName, result, date };
     let updatedTests;
+
     if (testType === "lessonTests") {
-      updatedTests = await Student.addTest(req.params.id, testType, newTest);
+      updatedTests = [...(student.lessonTests || []), newTest];
+      await Student.update(req.params.id, { lessonTests: updatedTests });
     } else if (testType === "tajweedTests") {
-      updatedTests = await Student.addTest(req.params.id, testType, newTest);
+      updatedTests = [...(student.tajweedTests || []), newTest];
+      await Student.update(req.params.id, { tajweedTests: updatedTests });
     } else if (testType === "memorizationTests") {
-      updatedTests = await Student.addTest(req.params.id, testType, newTest);
+      updatedTests = [...(student.memorizationTests || []), newTest];
+      await Student.update(req.params.id, { memorizationTests: updatedTests });
     } else {
       return res.status(400).json({ message: "نوع الاختبار غير صحيح" });
     }
 
-    res.json({ message: "تم إضافة الاختبار", tests: updatedTests });
+    const updatedStudent = await Student.findById(req.params.id);
+    res.json(updatedStudent);
   } catch (err) {
-    console.error("Error adding test:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -104,16 +106,29 @@ router.put("/:id/tests/:testIndex", async (req, res) => {
   const { id, testIndex } = req.params;
   
   try {
-    const updatedTests = await Student.updateTest(id, testType, parseInt(testIndex), {
-      testName,
-      lessonName: testName,
-      result,
-      date
-    });
-    
-    res.json({ message: "تم تعديل الاختبار", tests: updatedTests });
+    const student = await Student.findById(id);
+    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
+
+    let testArray;
+    if (testType === "lessonTests") testArray = [...(student.lessonTests || [])];
+    else if (testType === "tajweedTests") testArray = [...(student.tajweedTests || [])];
+    else if (testType === "memorizationTests") testArray = [...(student.memorizationTests || [])];
+    else return res.status(400).json({ message: "نوع الاختبار غير صحيح" });
+
+    const index = parseInt(testIndex);
+    if (index < 0 || index >= testArray.length) {
+      return res.status(404).json({ message: "الاختبار غير موجود" });
+    }
+
+    testArray[index] = { ...testArray[index], testName, lessonName: testName, result, date };
+
+    const updateData = {};
+    updateData[testType] = testArray;
+    await Student.update(id, updateData);
+
+    const updatedStudent = await Student.findById(id);
+    res.json(updatedStudent);
   } catch (err) {
-    console.error("Error updating test:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -124,10 +139,29 @@ router.delete("/:id/tests/:testIndex", async (req, res) => {
   const { id, testIndex } = req.params;
   
   try {
-    const updatedTests = await Student.deleteTest(id, testType, parseInt(testIndex));
-    res.json({ message: "تم حذف الاختبار", tests: updatedTests });
+    const student = await Student.findById(id);
+    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
+
+    let testArray;
+    if (testType === "lessonTests") testArray = [...(student.lessonTests || [])];
+    else if (testType === "tajweedTests") testArray = [...(student.tajweedTests || [])];
+    else if (testType === "memorizationTests") testArray = [...(student.memorizationTests || [])];
+    else return res.status(400).json({ message: "نوع الاختبار غير صحيح" });
+
+    const index = parseInt(testIndex);
+    if (index < 0 || index >= testArray.length) {
+      return res.status(404).json({ message: "الاختبار غير موجود" });
+    }
+
+    testArray.splice(index, 1);
+
+    const updateData = {};
+    updateData[testType] = testArray;
+    await Student.update(id, updateData);
+
+    const updatedStudent = await Student.findById(id);
+    res.json(updatedStudent);
   } catch (err) {
-    console.error("Error deleting test:", err);
     res.status(400).json({ message: err.message });
   }
 });
@@ -137,6 +171,7 @@ router.post("/:id/monthly-pages", async (req, res) => {
   const { month, year, pages, goal } = req.body;
   
   console.log("📝 Received monthly pages data:", req.body);
+  console.log("🎯 Student ID:", req.params.id);
   
   if (!month || !year || pages === undefined) {
     return res.status(400).json({ 
@@ -148,19 +183,32 @@ router.post("/:id/monthly-pages", async (req, res) => {
     const student = await Student.findById(req.params.id);
     if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
 
-    const updatedPages = await Student.updateMonthlyPages(
-      req.params.id, 
-      parseInt(month), 
-      parseInt(year), 
-      parseInt(pages), 
-      goal ? parseInt(goal) : 20
+    let monthlyPages = student.monthlyPages || [];
+    const existingIndex = monthlyPages.findIndex(
+      m => m.month === parseInt(month) && m.year === parseInt(year)
     );
-    
+
+    const newPageData = {
+      month: parseInt(month),
+      year: parseInt(year),
+      pages: parseInt(pages),
+      goal: goal ? parseInt(goal) : 20,
+      lastUpdate: new Date().toISOString()
+    };
+
+    if (existingIndex !== -1) {
+      monthlyPages[existingIndex] = newPageData;
+    } else {
+      monthlyPages.push(newPageData);
+    }
+
+    await Student.update(req.params.id, { monthlyPages });
     console.log("✅ Monthly pages saved successfully");
     
+    const updatedStudent = await Student.findById(req.params.id);
     res.json({ 
       message: "تم حفظ بيانات الصفحات بنجاح",
-      monthlyPages: updatedPages 
+      student: updatedStudent 
     });
   } catch (err) {
     console.error("❌ Error saving monthly pages:", err);
@@ -179,17 +227,27 @@ router.put("/:id/monthly-pages/:pageIndex", async (req, res) => {
     const student = await Student.findById(id);
     if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
 
-    const monthlyPages = await Student.updateMonthlyPages(
-      id, 
-      parseInt(month), 
-      parseInt(year), 
-      parseInt(pages), 
-      goal ? parseInt(goal) : 20
-    );
+    const index = parseInt(pageIndex);
+    let monthlyPages = student.monthlyPages || [];
     
+    if (index < 0 || index >= monthlyPages.length) {
+      return res.status(404).json({ message: "بيانات الصفحات غير موجودة" });
+    }
+
+    monthlyPages[index] = {
+      month: parseInt(month),
+      year: parseInt(year),
+      pages: parseInt(pages),
+      goal: goal ? parseInt(goal) : 20,
+      lastUpdate: new Date().toISOString()
+    };
+
+    await Student.update(id, { monthlyPages });
+
+    const updatedStudent = await Student.findById(id);
     res.json({ 
       message: "تم تعديل بيانات الصفحات بنجاح",
-      monthlyPages
+      student: updatedStudent 
     });
   } catch (err) {
     console.error("❌ Error updating monthly pages:", err);
@@ -204,10 +262,23 @@ router.delete("/:id/monthly-pages/:pageIndex", async (req, res) => {
   const { id, pageIndex } = req.params;
   
   try {
-    const monthlyPages = await Student.deleteMonthlyPage(id, parseInt(pageIndex));
+    const student = await Student.findById(id);
+    if (!student) return res.status(404).json({ message: "الطالب غير موجود" });
+
+    const index = parseInt(pageIndex);
+    let monthlyPages = student.monthlyPages || [];
+    
+    if (index < 0 || index >= monthlyPages.length) {
+      return res.status(404).json({ message: "بيانات الصفحات غير موجودة" });
+    }
+
+    monthlyPages.splice(index, 1);
+    await Student.update(id, { monthlyPages });
+
+    const updatedStudent = await Student.findById(id);
     res.json({ 
       message: "تم حذف بيانات الصفحات بنجاح",
-      monthlyPages
+      student: updatedStudent 
     });
   } catch (err) {
     console.error("❌ Error deleting monthly pages:", err);
