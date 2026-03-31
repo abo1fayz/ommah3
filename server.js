@@ -3,13 +3,12 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
-const connectDB = require("./config/db");
+// إزالة connectDB واستبدالها بـ Firebase
+// const connectDB = require("./config/db");
+
 const studentRoutes = require("./routes/studentRoutes");
 const competitionRoutes = require("./routes/competitionRoutes");
 const achievementRoutes = require("./routes/achievementRoutes");
-
-// الاتصال بقاعدة البيانات
-connectDB();
 
 // إنشاء السيرفر
 const app = express();
@@ -53,13 +52,13 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "index.html"));
 });
 
-// تشغيل السيرفر للسيرفر المحلي فقط
+// تشغيل السيرفر
 if (require.main === module) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`✅ Server running on port ${PORT}`);
+    console.log(`📁 Firebase Storage ready`);
   });
 }
 
-// التصدير للتشغيل على Vercel
 module.exports = app;
