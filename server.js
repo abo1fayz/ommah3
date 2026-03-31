@@ -3,18 +3,8 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
-// التحقق من البيئة
-const isVercel = process.env.VERCEL === '1';
-
-// استيراد Firebase فقط إذا كان متاحاً
-let db;
-try {
-  const firebase = require("./config/firebase-admin");
-  db = firebase.db;
-  console.log('✅ Firebase loaded');
-} catch (error) {
-  console.error('⚠️ Firebase not available:', error.message);
-}
+// استيراد Firebase
+const { db } = require("./config/firebase");
 
 // استيراد المسارات
 const studentRoutes = require("./routes/studentRoutes");
@@ -28,30 +18,24 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware للتحقق من قاعدة البيانات
+app.use((req, res, next) => {
+  if (!db && req.path.startsWith('/api/')) {
+    return res.status(503).json({ 
+      message: "قاعدة البيانات غير متاحة حالياً. يرجى المحاولة لاحقاً.",
+      error: "Firebase not initialized"
+    });
+  }
+  next();
+});
+
 // خدمة الملفات الثابتة
 app.use(express.static(path.join(__dirname, "frontend")));
 
-// API Routes - مع معالجة الأخطاء
-app.use("/api/students", (req, res, next) => {
-  if (!db) {
-    return res.status(503).json({ message: "قاعدة البيانات غير متاحة حالياً" });
-  }
-  next();
-}, studentRoutes);
-
-app.use("/api/competitions", (req, res, next) => {
-  if (!db) {
-    return res.status(503).json({ message: "قاعدة البيانات غير متاحة حالياً" });
-  }
-  next();
-}, competitionRoutes);
-
-app.use("/api/achievements", (req, res, next) => {
-  if (!db) {
-    return res.status(503).json({ message: "قاعدة البيانات غير متاحة حالياً" });
-  }
-  next();
-}, achievementRoutes);
+// API Routes
+app.use("/api/students", studentRoutes);
+app.use("/api/competitions", competitionRoutes);
+app.use("/api/achievements", achievementRoutes);
 
 // Routes للواجهات
 app.get("/", (req, res) => {
@@ -74,14 +58,29 @@ app.get("/achievements", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "achievements.html"));
 });
 
-// معالج الأخطاء العام
+// أي رابط غير معروف
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+});
+
+// معالج الأخطاء
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err);
+  console.error("❌ Server error:", err);
   res.status(500).json({ 
     message: "حدث خطأ في الخادم",
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    error: process.env.NODE_ENV === "development" ? err.message : undefined
   });
 });
 
-// تصدير للتشغيل على Vercel
+// تشغيل السيرفر محلياً فقط
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+    if (!db) {
+      console.log("⚠️ Warning: Firebase not connected. Running in limited mode.");
+    }
+  });
+}
+
 module.exports = app;
