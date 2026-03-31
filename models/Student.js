@@ -1,11 +1,12 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/firebase-client');
+const { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, query, where, limit } = require('firebase/firestore');
 
 const COLLECTION_NAME = 'students';
 
 // دالة مساعدة لتحويل بيانات Firestore إلى كائن
-const convertDoc = (doc) => {
-  if (!doc.exists) return null;
-  return { id: doc.id, ...doc.data() };
+const convertDoc = (docSnap) => {
+  if (!docSnap.exists()) return null;
+  return { id: docSnap.id, ...docSnap.data() };
 };
 
 // دالة مساعدة لتحويل قائمة المستندات
@@ -17,38 +18,39 @@ const convertDocs = (snapshot) => {
   return students;
 };
 
-// دوال CRUD
 const StudentModel = {
   // جلب جميع الطلاب
   findAll: async () => {
-    const snapshot = await db.collection(COLLECTION_NAME).get();
+    const studentsRef = collection(db, COLLECTION_NAME);
+    const snapshot = await getDocs(studentsRef);
     return convertDocs(snapshot);
   },
 
   // جلب طالب حسب ID
   findById: async (id) => {
-    const doc = await db.collection(COLLECTION_NAME).doc(id).get();
-    return convertDoc(doc);
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
+    return convertDoc(docSnap);
   },
 
   // جلب طالب حسب الكود
   findOne: async (filter) => {
     const { code } = filter;
     if (code) {
-      const snapshot = await db.collection(COLLECTION_NAME)
-        .where('code', '==', code)
-        .limit(1)
-        .get();
+      const studentsRef = collection(db, COLLECTION_NAME);
+      const q = query(studentsRef, where('code', '==', code), limit(1));
+      const snapshot = await getDocs(q);
       
       if (snapshot.empty) return null;
-      return convertDoc(snapshot.docs[0]);
+      const doc = snapshot.docs[0];
+      return { id: doc.id, ...doc.data() };
     }
     return null;
   },
 
   // إنشاء طالب جديد
   create: async (data) => {
-    const docRef = db.collection(COLLECTION_NAME).doc();
+    const studentsRef = collection(db, COLLECTION_NAME);
     const newStudent = {
       ...data,
       createdAt: new Date().toISOString(),
@@ -58,35 +60,35 @@ const StudentModel = {
       memorizationTests: data.memorizationTests || [],
       monthlyPages: data.monthlyPages || []
     };
-    await docRef.set(newStudent);
+    const docRef = await addDoc(studentsRef, newStudent);
     return { id: docRef.id, ...newStudent };
   },
 
   // تحديث طالب
   update: async (id, data) => {
-    const docRef = db.collection(COLLECTION_NAME).doc(id);
-    const doc = await docRef.get();
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
     
-    if (!doc.exists) return null;
+    if (!docSnap.exists()) return null;
     
     const updateData = {
       ...data,
       updatedAt: new Date().toISOString()
     };
-    await docRef.update(updateData);
+    await updateDoc(docRef, updateData);
     
-    return { id, ...doc.data(), ...updateData };
+    return { id, ...docSnap.data(), ...updateData };
   },
 
   // حذف طالب
   delete: async (id) => {
-    const docRef = db.collection(COLLECTION_NAME).doc(id);
-    const doc = await docRef.get();
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const docSnap = await getDoc(docRef);
     
-    if (!doc.exists) return null;
+    if (!docSnap.exists()) return null;
     
-    await docRef.delete();
-    return { id, ...doc.data() };
+    await deleteDoc(docRef);
+    return { id, ...docSnap.data() };
   }
 };
 
