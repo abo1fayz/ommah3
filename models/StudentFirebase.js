@@ -1,129 +1,245 @@
 const { db } = require('../config/firebase-admin');
 
+const COLLECTION = 'students';
+
 class StudentModel {
   // جلب جميع الطلاب
   static async findAll() {
-    const snapshot = await db.collection('students').get();
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    try {
+      const snapshot = await db.collection(COLLECTION)
+        .orderBy('createdAt', 'desc')
+        .get();
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (error) {
+      console.error('Error finding all students:', error);
+      throw error;
+    }
   }
 
   // جلب طالب بالكود
   static async findByCode(code) {
-    const snapshot = await db.collection('students')
-      .where('code', '==', code)
-      .limit(1)
-      .get();
-    
-    if (snapshot.empty) return null;
-    const doc = snapshot.docs[0];
-    return { id: doc.id, ...doc.data() };
+    try {
+      const snapshot = await db.collection(COLLECTION)
+        .where('code', '==', code)
+        .limit(1)
+        .get();
+      
+      if (snapshot.empty) return null;
+      
+      const doc = snapshot.docs[0];
+      return { id: doc.id, ...doc.data() };
+    } catch (error) {
+      console.error('Error finding student by code:', error);
+      throw error;
+    }
   }
 
   // جلب طالب بالمعرف
   static async findById(id) {
-    const doc = await db.collection('students').doc(id).get();
-    if (!doc.exists) return null;
-    return { id: doc.id, ...doc.data() };
+    try {
+      const doc = await db.collection(COLLECTION).doc(id).get();
+      if (!doc.exists) return null;
+      return { id: doc.id, ...doc.data() };
+    } catch (error) {
+      console.error('Error finding student by id:', error);
+      throw error;
+    }
   }
 
   // إنشاء طالب جديد
   static async create(data) {
-    const docRef = await db.collection('students').add({
-      ...data,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
-    return { id: docRef.id, ...data };
+    try {
+      const now = new Date().toISOString();
+      const docRef = await db.collection(COLLECTION).add({
+        ...data,
+        createdAt: now,
+        updatedAt: now,
+        lessonTests: data.lessonTests || [],
+        tajweedTests: data.tajweedTests || [],
+        memorizationTests: data.memorizationTests || [],
+        monthlyPages: data.monthlyPages || []
+      });
+      
+      return { id: docRef.id, ...data };
+    } catch (error) {
+      console.error('Error creating student:', error);
+      throw error;
+    }
   }
 
   // تحديث طالب
   static async update(id, data) {
-    await db.collection('students').doc(id).update({
-      ...data,
-      updatedAt: new Date().toISOString()
-    });
-    return { id, ...data };
+    try {
+      const docRef = db.collection(COLLECTION).doc(id);
+      const doc = await docRef.get();
+      
+      if (!doc.exists) return null;
+      
+      await docRef.update({
+        ...data,
+        updatedAt: new Date().toISOString()
+      });
+      
+      const updated = await docRef.get();
+      return { id: updated.id, ...updated.data() };
+    } catch (error) {
+      console.error('Error updating student:', error);
+      throw error;
+    }
   }
 
   // حذف طالب
   static async delete(id) {
-    await db.collection('students').doc(id).delete();
-    return true;
+    try {
+      await db.collection(COLLECTION).doc(id).delete();
+      return true;
+    } catch (error) {
+      console.error('Error deleting student:', error);
+      throw error;
+    }
   }
 
   // إضافة اختبار
   static async addTest(studentId, testType, testData) {
-    const studentRef = db.collection('students').doc(studentId);
-    const student = await this.findById(studentId);
-    
-    const tests = student[testType] || [];
-    tests.push({
-      ...testData,
-      id: Date.now().toString(),
-      date: testData.date || new Date().toISOString()
-    });
-    
-    await studentRef.update({ [testType]: tests });
-    return tests;
+    try {
+      const student = await this.findById(studentId);
+      if (!student) throw new Error('Student not found');
+      
+      const tests = student[testType] || [];
+      const newTest = {
+        ...testData,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString()
+      };
+      
+      tests.push(newTest);
+      
+      await db.collection(COLLECTION).doc(studentId).update({
+        [testType]: tests,
+        updatedAt: new Date().toISOString()
+      });
+      
+      return tests;
+    } catch (error) {
+      console.error('Error adding test:', error);
+      throw error;
+    }
   }
 
   // تحديث اختبار
   static async updateTest(studentId, testType, testIndex, testData) {
-    const student = await this.findById(studentId);
-    const tests = student[testType] || [];
-    
-    if (tests[testIndex]) {
+    try {
+      const student = await this.findById(studentId);
+      if (!student) throw new Error('Student not found');
+      
+      const tests = student[testType] || [];
+      if (!tests[testIndex]) throw new Error('Test not found');
+      
       tests[testIndex] = { ...tests[testIndex], ...testData };
-      await db.collection('students').doc(studentId).update({ [testType]: tests });
+      
+      await db.collection(COLLECTION).doc(studentId).update({
+        [testType]: tests,
+        updatedAt: new Date().toISOString()
+      });
+      
+      return tests;
+    } catch (error) {
+      console.error('Error updating test:', error);
+      throw error;
     }
-    
-    return tests;
   }
 
   // حذف اختبار
   static async deleteTest(studentId, testType, testIndex) {
-    const student = await this.findById(studentId);
-    const tests = student[testType] || [];
-    
-    if (tests[testIndex]) {
+    try {
+      const student = await this.findById(studentId);
+      if (!student) throw new Error('Student not found');
+      
+      const tests = student[testType] || [];
+      if (!tests[testIndex]) throw new Error('Test not found');
+      
       tests.splice(testIndex, 1);
-      await db.collection('students').doc(studentId).update({ [testType]: tests });
+      
+      await db.collection(COLLECTION).doc(studentId).update({
+        [testType]: tests,
+        updatedAt: new Date().toISOString()
+      });
+      
+      return tests;
+    } catch (error) {
+      console.error('Error deleting test:', error);
+      throw error;
     }
-    
-    return tests;
   }
 
   // إضافة أو تحديث الصفحات الشهرية
-  static async updateMonthlyPages(studentId, month, year, pages, goal) {
-    const student = await this.findById(studentId);
-    let monthlyPages = student.monthlyPages || [];
-    
-    const existingIndex = monthlyPages.findIndex(
-      p => p.month === month && p.year === year
-    );
-    
-    if (existingIndex !== -1) {
-      monthlyPages[existingIndex] = {
-        ...monthlyPages[existingIndex],
-        pages,
-        goal: goal || 20,
-        lastUpdate: new Date().toISOString()
-      };
-    } else {
-      monthlyPages.push({
+  static async updateMonthlyPages(studentId, month, year, pages, goal = 20) {
+    try {
+      const student = await this.findById(studentId);
+      if (!student) throw new Error('Student not found');
+      
+      let monthlyPages = student.monthlyPages || [];
+      const existingIndex = monthlyPages.findIndex(
+        p => p.month === month && p.year === year
+      );
+      
+      const pageData = {
         month,
         year,
         pages,
-        goal: goal || 20,
+        goal,
         lastUpdate: new Date().toISOString()
+      };
+      
+      if (existingIndex !== -1) {
+        monthlyPages[existingIndex] = { ...monthlyPages[existingIndex], ...pageData };
+      } else {
+        monthlyPages.push(pageData);
+      }
+      
+      // ترتيب حسب السنة والشهر (الأحدث أولاً)
+      monthlyPages.sort((a, b) => {
+        if (a.year !== b.year) return b.year - a.year;
+        return b.month - a.month;
       });
+      
+      await db.collection(COLLECTION).doc(studentId).update({
+        monthlyPages,
+        updatedAt: new Date().toISOString()
+      });
+      
+      return monthlyPages;
+    } catch (error) {
+      console.error('Error updating monthly pages:', error);
+      throw error;
     }
-    
-    await db.collection('students').doc(studentId).update({ monthlyPages });
-    return monthlyPages;
+  }
+
+  // حذف صفحة شهرية
+  static async deleteMonthlyPage(studentId, pageIndex) {
+    try {
+      const student = await this.findById(studentId);
+      if (!student) throw new Error('Student not found');
+      
+      const monthlyPages = student.monthlyPages || [];
+      if (!monthlyPages[pageIndex]) throw new Error('Page not found');
+      
+      monthlyPages.splice(pageIndex, 1);
+      
+      await db.collection(COLLECTION).doc(studentId).update({
+        monthlyPages,
+        updatedAt: new Date().toISOString()
+      });
+      
+      return monthlyPages;
+    } catch (error) {
+      console.error('Error deleting monthly page:', error);
+      throw error;
+    }
   }
 }
 
