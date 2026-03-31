@@ -628,7 +628,12 @@
                     <i class="fas fa-users"></i>
                     <span>قائمة الطلاب المسجلين</span>
                 </div>
-                <div class="student-list" id="studentsList"></div>
+                <div id="studentsList" class="student-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل الطلاب...</p>
+                    </div>
+                </div>
             </div>
             
             <div class="tab-content" id="add-student">
@@ -772,7 +777,12 @@
                     <i class="fas fa-trophy"></i>
                     <span>قائمة المسابقات</span>
                 </div>
-                <div class="competition-list" id="competitionsList"></div>
+                <div id="competitionsList" class="competition-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل المسابقات...</p>
+                    </div>
+                </div>
             </div>
 
             <div class="tab-content" id="add-competition">
@@ -834,7 +844,12 @@
                     <i class="fas fa-medal"></i>
                     <span>قائمة الإنجازات</span>
                 </div>
-                <div class="achievement-list" id="achievementsList"></div>
+                <div id="achievementsList" class="achievement-list">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل الإنجازات...</p>
+                    </div>
+                </div>
             </div>
 
             <div class="tab-content" id="add-achievement">
@@ -962,34 +977,6 @@
     </div>
 
     <script>
-
-
-
-
-
-
-
-// اختبار بسيط لجلب البيانات
-async function testFetch() {
-    console.log('🔍 اختبار جلب البيانات...');
-    try {
-        const res = await fetch('/api/students');
-        console.log('📡 حالة الاستجابة:', res.status);
-        const data = await res.json();
-        console.log('📊 عدد الطلاب:', data.length);
-        console.log('📝 أول طالب:', data[0]);
-        return data;
-    } catch (error) {
-        console.error('❌ خطأ في الجلب:', error);
-    }
-}
-
-// تشغيل الاختبار
-testFetch();
-
-
-
-
         // ==================== المتغيرات العامة ====================
         const API_URL = "/api";
         let studentsData = [];
@@ -1044,9 +1031,13 @@ testFetch();
         }
 
         function updateStats() {
-            document.getElementById('totalStudents').textContent = studentsData.length;
-            document.getElementById('totalCompetitions').textContent = competitionsData.length;
-            document.getElementById('totalAchievements').textContent = achievementsData.length;
+            const totalStudentsEl = document.getElementById('totalStudents');
+            const totalCompetitionsEl = document.getElementById('totalCompetitions');
+            const totalAchievementsEl = document.getElementById('totalAchievements');
+            
+            if (totalStudentsEl) totalStudentsEl.textContent = studentsData.length;
+            if (totalCompetitionsEl) totalCompetitionsEl.textContent = competitionsData.length;
+            if (totalAchievementsEl) totalAchievementsEl.textContent = achievementsData.length;
         }
 
         function escapeHtml(text) {
@@ -1059,27 +1050,65 @@ testFetch();
         // ==================== جلب البيانات ====================
         
         async function fetchStudents() {
+            const container = document.getElementById('studentsList');
+            if (container) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل الطلاب...</p>
+                    </div>
+                `;
+            }
+            
             try {
                 console.log('🔄 جلب بيانات الطلاب...');
                 const res = await fetch(`${API_URL}/students`);
-                if (!res.ok) throw new Error('فشل في جلب البيانات');
+                console.log('📡 استجابة الطلاب - الحالة:', res.status);
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                
                 studentsData = await res.json();
                 console.log(`✅ تم جلب ${studentsData.length} طالب`);
+                console.log('📝 بيانات الطلاب:', studentsData);
+                
                 renderStudents(studentsData);
                 updateStudentSelects();
                 updateStats();
                 return studentsData;
             } catch (error) {
-                console.error('❌ Error fetching students:', error);
-                showMessage('studentMessage', 'حدث خطأ في جلب بيانات الطلاب', 'error');
+                console.error('❌ خطأ في جلب الطلاب:', error);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>حدث خطأ في تحميل الطلاب</p>
+                            <button class="btn btn-primary btn-sm" onclick="fetchStudents()">
+                                <i class="fas fa-sync"></i> إعادة المحاولة
+                            </button>
+                        </div>
+                    `;
+                }
                 return [];
             }
         }
 
         async function fetchCompetitions() {
+            const container = document.getElementById('competitionsList');
+            if (container) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل المسابقات...</p>
+                    </div>
+                `;
+            }
+            
             try {
                 console.log('🔄 جلب بيانات المسابقات...');
                 const res = await fetch(`${API_URL}/competitions`);
+                
                 if (!res.ok) throw new Error('فشل في جلب البيانات');
                 competitionsData = await res.json();
                 console.log(`✅ تم جلب ${competitionsData.length} مسابقة`);
@@ -1088,14 +1117,36 @@ testFetch();
                 return competitionsData;
             } catch (error) {
                 console.error('❌ Error fetching competitions:', error);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>حدث خطأ في تحميل المسابقات</p>
+                            <button class="btn btn-primary btn-sm" onclick="fetchCompetitions()">
+                                <i class="fas fa-sync"></i> إعادة المحاولة
+                            </button>
+                        </div>
+                    `;
+                }
                 return [];
             }
         }
 
         async function fetchAchievements() {
+            const container = document.getElementById('achievementsList');
+            if (container) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل الإنجازات...</p>
+                    </div>
+                `;
+            }
+            
             try {
                 console.log('🔄 جلب بيانات الإنجازات...');
                 const res = await fetch(`${API_URL}/achievements`);
+                
                 if (!res.ok) throw new Error('فشل في جلب البيانات');
                 achievementsData = await res.json();
                 console.log(`✅ تم جلب ${achievementsData.length} إنجاز`);
@@ -1104,6 +1155,17 @@ testFetch();
                 return achievementsData;
             } catch (error) {
                 console.error('❌ Error fetching achievements:', error);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="no-data">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>حدث خطأ في تحميل الإنجازات</p>
+                            <button class="btn btn-primary btn-sm" onclick="fetchAchievements()">
+                                <i class="fas fa-sync"></i> إعادة المحاولة
+                            </button>
+                        </div>
+                    `;
+                }
                 return [];
             }
         }
@@ -1304,16 +1366,13 @@ testFetch();
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // مسح الحقول
                     document.getElementById('newStudentName').value = '';
                     document.getElementById('newStudentCode').value = '';
                     
-                    // تحديث البيانات فوراً
                     await refreshAllData();
                     
                     showMessage('studentMessage', `✅ تم إضافة الطالب "${name}" بنجاح`, 'success');
                     
-                    // الانتقال إلى قائمة الطلاب بعد 1.5 ثانية
                     setTimeout(() => {
                         switchToTab('students');
                     }, 1500);
