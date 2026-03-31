@@ -6,8 +6,7 @@ const router = express.Router();
 /* جلب جميع الإنجازات */
 router.get("/", async (req, res) => {
   try {
-    const achievements = await Achievement.find()
-      .sort({ createdAt: -1 });
+    const achievements = await Achievement.findAll();
     res.json(achievements);
   } catch (err) {
     res.status(500).json({ message: "خطأ في جلب الإنجازات" });
@@ -39,7 +38,7 @@ router.post("/", upload.array('images', 10), async (req, res) => {
       publicId: file.filename
     })) || [];
 
-    const achievement = new Achievement({
+    const achievement = await Achievement.create({
       title,
       description,
       images,
@@ -47,7 +46,6 @@ router.post("/", upload.array('images', 10), async (req, res) => {
       category: category || "عام"
     });
 
-    await achievement.save();
     res.status(201).json(achievement);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -64,23 +62,22 @@ router.put("/:id", upload.array('images', 10), async (req, res) => {
       return res.status(404).json({ message: "الإنجاز غير موجود" });
     }
 
-    // تحديث الحقول الأساسية
-    if (title) achievement.title = title;
-    if (description) achievement.description = description;
-    if (tags) achievement.tags = tags.split(',').map(tag => tag.trim());
-    if (category) achievement.category = category;
+    const updateData = {};
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    if (tags) updateData.tags = tags.split(',').map(tag => tag.trim());
+    if (category) updateData.category = category;
 
-    // إضافة صور جديدة إذا وجدت
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map(file => ({
         url: file.path,
         publicId: file.filename
       }));
-      achievement.images = [...achievement.images, ...newImages];
+      updateData.images = [...(achievement.images || []), ...newImages];
     }
 
-    await achievement.save();
-    res.json(achievement);
+    const updatedAchievement = await Achievement.update(req.params.id, updateData);
+    res.json(updatedAchievement);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -89,10 +86,8 @@ router.put("/:id", upload.array('images', 10), async (req, res) => {
 /* حذف إنجاز */
 router.delete("/:id", async (req, res) => {
   try {
-    const achievement = await Achievement.findByIdAndDelete(req.params.id);
+    const achievement = await Achievement.delete(req.params.id);
     if (!achievement) return res.status(404).json({ message: "الإنجاز غير موجود" });
-    
-    // TODO: حذف الصور من Cloudinary
     res.json({ message: "تم حذف الإنجاز بنجاح" });
   } catch (err) {
     res.status(500).json({ message: "خطأ أثناء الحذف" });
@@ -105,17 +100,16 @@ router.delete("/:id/images/:imageId", async (req, res) => {
     const achievement = await Achievement.findById(req.params.id);
     if (!achievement) return res.status(404).json({ message: "الإنجاز غير موجود" });
 
-    const imageIndex = achievement.images.findIndex(img => img.publicId === req.params.imageId);
-    if (imageIndex === -1) return res.status(404).json({ message: "الصورة غير موجودة" });
+    const imageExists = achievement.images?.some(img => img.publicId === req.params.imageId);
+    if (!imageExists) return res.status(404).json({ message: "الصورة غير موجودة" });
 
-    // TODO: حذف الصورة من Cloudinary
     const cloudinary = require('../config/cloudinary');
     await cloudinary.uploader.destroy(req.params.imageId);
-
-    achievement.images.splice(imageIndex, 1);
-    await achievement.save();
     
-    res.json({ message: "تم حذف الصورة بنجاح", achievement });
+    await Achievement.deleteImage(req.params.id, req.params.imageId);
+    
+    const updatedAchievement = await Achievement.findById(req.params.id);
+    res.json({ message: "تم حذف الصورة بنجاح", achievement: updatedAchievement });
   } catch (err) {
     res.status(500).json({ message: "خطأ أثناء حذف الصورة" });
   }
@@ -127,26 +121,10 @@ router.post("/:id/like", async (req, res) => {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ message: "معرف المستخدم مطلوب" });
 
-    const achievement = await Achievement.findById(req.params.id);
-    if (!achievement) return res.status(404).json({ message: "الإنجاز غير موجود" });
-
-    const alreadyLiked = achievement.likedBy.includes(userId);
+    const result = await Achievement.addLike(req.params.id, userId);
+    if (!result) return res.status(404).json({ message: "الإنجاز غير موجود" });
     
-    if (alreadyLiked) {
-      // إزالة الإعجاب
-      achievement.likes -= 1;
-      achievement.likedBy = achievement.likedBy.filter(id => id !== userId);
-    } else {
-      // إضافة إعجاب
-      achievement.likes += 1;
-      achievement.likedBy.push(userId);
-    }
-
-    await achievement.save();
-    res.json({ 
-      likes: achievement.likes, 
-      liked: !alreadyLiked 
-    });
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: "خطأ في الإعجاب" });
   }
@@ -160,13 +138,10 @@ router.post("/:id/comments", async (req, res) => {
       return res.status(400).json({ message: "اسم المستخدم والتعليق مطلوبان" });
     }
 
-    const achievement = await Achievement.findById(req.params.id);
-    if (!achievement) return res.status(404).json({ message: "الإنجاز غير موجود" });
-
-    achievement.comments.push({ user, comment });
-    await achievement.save();
+    const newComment = await Achievement.addComment(req.params.id, { user, comment });
+    if (!newComment) return res.status(404).json({ message: "الإنجاز غير موجود" });
     
-    res.json(achievement.comments[achievement.comments.length - 1]);
+    res.json(newComment);
   } catch (err) {
     res.status(500).json({ message: "خطأ في إضافة التعليق" });
   }
@@ -175,17 +150,8 @@ router.post("/:id/comments", async (req, res) => {
 /* حذف تعليق */
 router.delete("/:id/comments/:commentId", async (req, res) => {
   try {
-    const achievement = await Achievement.findById(req.params.id);
-    if (!achievement) return res.status(404).json({ message: "الإنجاز غير موجود" });
-
-    const commentIndex = achievement.comments.findIndex(
-      comment => comment._id.toString() === req.params.commentId
-    );
-    
-    if (commentIndex === -1) return res.status(404).json({ message: "التعليق غير موجود" });
-
-    achievement.comments.splice(commentIndex, 1);
-    await achievement.save();
+    const result = await Achievement.deleteComment(req.params.id, req.params.commentId);
+    if (!result) return res.status(404).json({ message: "الإنجاز غير موجود" });
     
     res.json({ message: "تم حذف التعليق بنجاح" });
   } catch (err) {
@@ -197,14 +163,7 @@ router.delete("/:id/comments/:commentId", async (req, res) => {
 router.get("/search/:query", async (req, res) => {
   try {
     const query = req.params.query;
-    const achievements = await Achievement.find({
-      $or: [
-        { title: { $regex: query, $options: "i" } },
-        { description: { $regex: query, $options: "i" } },
-        { tags: { $regex: query, $options: "i" } }
-      ]
-    }).sort({ createdAt: -1 });
-    
+    const achievements = await Achievement.search(query);
     res.json(achievements);
   } catch (err) {
     res.status(500).json({ message: "خطأ في البحث" });
